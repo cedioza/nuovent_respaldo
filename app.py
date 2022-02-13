@@ -1,5 +1,4 @@
 from flask import Flask, jsonify,request
-import requests
 from decouple import config
 from firebase import firebase
 
@@ -22,7 +21,7 @@ def users():
 
 
 @app.route('/productos')
-def users():
+def productos():
 
     users = firebase.get('/product', None)
     return jsonify(users)
@@ -58,14 +57,4 @@ def delete(numDoc):
 #print(firebase.put('/product','-MveibFb9AzLgX3e5JQm"',data2))
 
 if __name__ == '__main__':
-    app.run(debug=True)
-
-
-#  for clave in data:
-        
-#         print(data[clave])
-#         print("name :" +clave)
-#         firebase.delete('/users',clave)
-        
-
-        
+    app.run()
