@@ -10,8 +10,11 @@ firebase = firebase.FirebaseApplication('https://'+url, None)
 
 @app.route('/')
 def index():
-    data = firebase.get('/', None)
-    return data
+    try:
+        data = firebase.get('/', None)
+    except:
+        return "fallo"
+    return "buenas"
 
 @app.route('/users')
 def users():
