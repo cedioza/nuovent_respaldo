@@ -3,11 +3,13 @@ from flask import Flask, jsonify,request
 from decouple import config
 import firebase_admin
 import requests
+from flask_cors import CORS
 from firebase_admin import credentials
 from firebase_admin import firestore
 from firebase_admin import db
 from firebase_admin import auth ,exceptions
 
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 app = Flask(__name__)
 
