@@ -1,16 +1,21 @@
+from ctypes import util
 from flask import Flask, jsonify,request
 from decouple import config
 import firebase_admin
 import requests
 from firebase_admin import credentials
 from firebase_admin import firestore
-import json
+from firebase_admin import db
+from firebase_admin import auth ,exceptions
+
+
 app = Flask(__name__)
+
+
 
 #module key file
 # Fetch the service account key JSON file contents
 key_json=config('KEY')
-
 
 
 url = config('URL_CREDENTIALS')
@@ -21,12 +26,8 @@ headers = {
 req = requests.get(url, json=None, headers=headers)
 data=req.json()["record"]
 
-
 cred = credentials.Certificate(data)
 url=config('URL_FIREBASE_PRUEBAS')
-
-
-
 
 
 # #firebase = firebase.FirebaseApplication('https://'+url, None)
@@ -37,20 +38,68 @@ firebase_admin.initialize_app(cred, {
 })
 
 
-
 # As an admin, the app has access to read and write all data, regradless of Security Rules
 
 
 
 @app.route('/')
 def index():
-            #data = firebase.get('/', None)
-    db=firestore.client()
-    db.collection('usuarios').add({"name":"matusalen","Age":"500s"})
-
     
-    return "buenas"
+    ref=db.reference("/product")
+    prueba=db.reference('/').child('product').order_by_key().limit_to_last(2).get()
+    return jsonify(prueba)
 
+
+#Loguear
+@app.route('/login',methods=['POST'])
+def login():   
+  data=request.json
+  usuario=data['usuario']
+  contraseña=data['contraseña']
+  mensaje=""
+  #user=auth.create_user(email=usuario,password=contraseña)
+  user=auth.get_user_by_email(usuario)
+  
+  return jsonify({"id":user.uid,"email":user.email})
+
+#Registrar Usuarios
+
+@app.route('/registro',methods=['POST'])
+def registro_usuarios():
+  ref=db.reference("/usuarios")
+  data=request.json
+  user={
+  "nombre":data["nombre"],
+  "typeDoc":data["typeDoc"],
+  "numDoc":data["numDoc"],
+  "userName":data["userName"],
+  "password":data["password"]
+  } 
+  create=ref.push(user)  
+  return jsonify({"Mensaje":"Usuario Creado satisfactoriamente","UID":create.key})
+  #jsonify(db.reference("/users").child(create.uid).get())
+
+@app.route('/product')
+def product():
+  data=db.reference('/product').child('-MvqvI_TTUbrDctEB7Ow').get()
+  return jsonify(data)
+
+@app.route('/validar')
+def validar():
+  validar=db.reference('/product').get()
+  if(len(validar)>=1):
+
+    for clave in validar:
+      if(True):
+
+        print(validar[clave])
+        
+        print(len(db.reference('/product').child('-MvqvI_TTUbrDctEB7Ow').get()))
+  else:
+    validar={"Message":"No hay datos"}
+    
+
+  return jsonify(db.reference('/product').child('-MvqvI_TTUbrDctEB7Ow').get())
 # @app.route('/users')
 # def users():
 
@@ -63,20 +112,6 @@ def index():
 
 #     users = firebase.get('/product', None)
 #     return jsonify(users)
-
-# @app.route('/registro')
-# def registro_usuarios():
-
-#     data={
-#     "nombre":request["nombre"],
-#     "typeDoc":request["typeDoc"],
-#     "numDoc":request["numDoc"],
-#     "userName":request["userName"],
-#     "password":request["password"]
-#     } 
-
-#     crear = firebase.post('/users',data)
-#     return jsonify("datos")
 
 
 # app.route('/eliminar<string:numDoc>')
@@ -95,4 +130,4 @@ def index():
 # #print(firebase.put('/product','-MveibFb9AzLgX3e5JQm"',data2))
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
