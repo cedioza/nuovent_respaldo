@@ -13,8 +13,6 @@ app = Flask(__name__)
 
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
-
-
 #module key file
 # Fetch the service account key JSON file contents
 key_json=config('KEY')
@@ -46,7 +44,6 @@ firebase_admin.initialize_app(cred, {
 
 @app.route('/')
 def index():
-    
     ref=db.reference("/product")
     prueba=db.reference('/').child('product').order_by_key().limit_to_last(2).get()
     return jsonify(prueba)
@@ -99,7 +96,6 @@ def validar():
         print(len(db.reference('/product').child('-MvqvI_TTUbrDctEB7Ow').get()))
   else:
     validar={"Message":"No hay datos"}
-    
 
   return jsonify(db.reference('/product').child('-MvqvI_TTUbrDctEB7Ow').get())
 # @app.route('/users')
