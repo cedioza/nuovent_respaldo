@@ -9,9 +9,9 @@ from firebase_admin import firestore
 from firebase_admin import db
 from firebase_admin import auth ,exceptions
 
-cors = CORS(app, resources={r"/*": {"origins": "*"}})
-
 app = Flask(__name__)
+
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 
