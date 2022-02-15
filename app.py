@@ -82,6 +82,18 @@ def list_usuarios():
     data={"user": user.uid}
     user
   return (data)
+# Obtener todos los  usuarios
+@app.route('/usuarios')
+def listaUsuarios():
+  database = db.reference("/usuarios").get()
+  return jsonify(database)
+
+# Obtener usuario en especifico
+@app.route('/usuarios<string:uid>')
+def listaUsuariosUid(uid):
+  database = db.reference("/usuarios").child(uid).get()
+  return jsonify(database)
+
 
 #colocar escuchadores  db.reference('/').listen()
 @app.route('/actualizarUsuario',methods=['PUT'])      
@@ -95,7 +107,7 @@ def validarActualizarUsuario():
         return False   
         
 @app.route('/eliminarUsuario',methods=['PUT'])      
-def validarActualizarUsuario():
+def eliminarUsuarios():
     database = db.reference("/usuarios")
     for key, value in database.items():
       if(value["numDoc"] == data["numDoc"]):
@@ -104,21 +116,9 @@ def validarActualizarUsuario():
       else:
         return False     
 
-#Respaldo actualizar
-# @app.route('/actualizarUsuario',methods=['POST'])      
-# def validarActualizarUsuario(reference,data):
-#     database = reference.get()
-#     for key, value in database.items():
-#       if(value["numDoc"] == data["numDoc"]):
-#         reference.child(key).update(data)
-#         return True
-#       else:
-#         return False 
-
-#Registrar Usuarios
 
 @app.route('/registro',methods=['POST'])
-def registro_usuarios():
+def registroUsuarios():
   reference=db.reference("/usuarios")
   data=request.json
   user={
@@ -129,11 +129,60 @@ def registro_usuarios():
   "password":data["password"]
   }
 
-  if(validarExisteUsuario(reference,user)):
-    return jsonify({"Mensaje":"Ya existe un usuario creado con ese documento"})
+#Alojamiento datos
+
+def validarExisteAlojamiento(reference,data):
+    database = reference.get()
+    for key, value in database.items():
+      if(value["numDoc"] == data["numDoc"]):
+        return True
+      else:
+        return False
+
+@app.route('/alojamiento',methods=['POST'])
+def registroAlojamientos():
+  reference=db.reference("/usuarios")
+  data=request.json
+  alojamiento={
+  "nombreAlojamiento":data["nombreAlojamiento"],
+  "nit":data["typeDoc"],
+  "email":data["numDoc"],
+  "telefono":data["userName"],
+  "responsable":data["password"],
+  "categoria":data["password"],
+  "descricion":data["password"],
+  "ciudad":data["password"],
+  "password":data["password"],
+  }
+
+  if(validarExisteAlojamiento(reference,user)):
+    return jsonify({"Mensaje":"Ya existe un alojamiento creado con ese nit"})
   else:
-    create=reference.push(user)
-    return jsonify({"Mensaje":"Usuario Creado satisfactoriamente","UID":create.key})
+    create=reference.push(alojamiento)
+    return jsonify({"Mensaje":"Alojamiento Creado satisfactoriamente","UID":create.key})
+
+#lista de productos
+
+@app.route('/actualizarAlojamiento',methods=['PUT'])      
+def actualizarAlojamiento():
+    database = db.reference("/alojamientos")
+    for key, value in database.items():
+      if(value["nit"] == data["nit"]):
+        database.child(key).update(data)
+        return True
+      else:
+        return False   
+        
+@app.route('/eliminarAlojamiento',methods=['POST'])      
+def eliminarAlojamiento():
+    database = db.reference("/usuarios")
+    for key, value in database.items():
+      if(value["nit"] == data["nit"]):
+        database.child(key).update({})
+        return True
+      else:
+        return False     
+
 
   #jsonify(db.reference("/users").child(create.uid).get())
 
@@ -144,10 +193,6 @@ def registro_usuarios():
 def product():
   data=db.reference('/product')
   return jsonify(data)
-
-
-
-
 
 @app.route('/validar')
 def validar():
