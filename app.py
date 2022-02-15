@@ -121,13 +121,19 @@ def eliminarUsuarios():
 def registroUsuarios():
   reference=db.reference("/usuarios")
   data=request.json
-  user={
+  usuarios={
   "nombre":data["nombre"],
   "typeDoc":data["typeDoc"],
   "numDoc":data["numDoc"],
   "userName":data["userName"],
   "password":data["password"]
   }
+
+  if(validarExisteAlojamiento(reference,usuarios)):
+    return jsonify({"Mensaje":"Ya existe un usuario creado con ese nit"})
+  else:
+    create=reference.push(usuarios)
+    return jsonify({"Mensaje":"usuario Creado satisfactoriamente","UID":create.key})
 
 #Alojamiento datos
 
