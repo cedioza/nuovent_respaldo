@@ -1,4 +1,5 @@
 from ctypes import util
+from weakref import ref
 from flask import Flask, jsonify,request
 from decouple import config
 import firebase_admin
@@ -17,18 +18,15 @@ cors = CORS(app, resources={r"/*": {"origins": "*"}})
 # Fetch the service account key JSON file contents
 key_json=config('KEY')
 
-
 url = config('URL_CREDENTIALS')
 headers = {
   'X-Master-Key': key_json
 }
-
 req = requests.get(url, json=None, headers=headers)
 data=req.json()["record"]
 
 cred = credentials.Certificate(data)
 url=config('URL_FIREBASE_PRUEBAS')
-
 
 # #firebase = firebase.FirebaseApplication('https://'+url, None)
 
@@ -37,17 +35,19 @@ firebase_admin.initialize_app(cred, {
     'databaseURL': url,
 })
 
-
 # As an admin, the app has access to read and write all data, regradless of Security Rules
-
-
 
 @app.route('/')
 def index():
-    ref=db.reference("/product")
-    prueba=db.reference('/').child('product').order_by_key().limit_to_last(2).get()
-    return jsonify(prueba)
-
+    # ref=db.reference("/product")
+    # prueba=db.reference('/').child('product').order_by_key().limit_to_last(2).get()
+    # return jsonify(prueba)
+    ref = db.reference("/product")
+    product = ref.get()
+    print(product)
+    for key, value in product.items():
+      print(key, value["message"])
+    return jsonify({"message":"mundo"})
 
 #Loguear
 @app.route('/login',methods=['POST'])
@@ -55,17 +55,71 @@ def login():
   data=request.json
   usuario=data['usuario']
   contraseña=data['contraseña']
-  mensaje=""
-  #user=auth.create_user(email=usuario,password=contraseña)
   user=auth.get_user_by_email(usuario)
+  if(user):
+    print ("bienvenido")
+  else:
+    user=auth.create_user(email=usuario,password=contraseña)
   
   return jsonify({"id":user.uid,"email":user.email})
+
+#Metodos utiles
+
+def validarExisteUsuario(reference,data):
+    database = reference.get()
+    for key, value in database.items():
+      if(value["numDoc"] == data["numDoc"]):
+        return True
+      else:
+        return False
+
+#listado de usuarios
+@app.route('/list')
+def list_usuarios():
+  page=auth.list_users()
+  data={}
+  for user in page.users:
+    data={"user": user.uid}
+    user
+  return (data)
+
+#colocar escuchadores  db.reference('/').listen()
+@app.route('/actualizarUsuario',methods=['PUT'])      
+def validarActualizarUsuario():
+    database = db.reference("/usuarios")
+    for key, value in database.items():
+      if(value["numDoc"] == data["numDoc"]):
+        database.child(key).update(data)
+        return True
+      else:
+        return False   
+        
+@app.route('/eliminarUsuario',methods=['PUT'])      
+def validarActualizarUsuario():
+    database = db.reference("/usuarios")
+    for key, value in database.items():
+      if(value["numDoc"] == data["numDoc"]):
+        database.child(key).update({})
+        return True
+      else:
+        return False     
+
+#Respaldo actualizar
+# @app.route('/actualizarUsuario',methods=['POST'])      
+# def validarActualizarUsuario(reference,data):
+#     database = reference.get()
+#     for key, value in database.items():
+#       if(value["numDoc"] == data["numDoc"]):
+#         reference.child(key).update(data)
+#         return True
+#       else:
+#         return False 
 
 #Registrar Usuarios
 
 @app.route('/registro',methods=['POST'])
 def registro_usuarios():
-  ref=db.reference("/usuarios")
+  reference=db.reference("/usuarios")
   data=request.json
   user={
   "nombre":data["nombre"],
@@ -73,15 +127,27 @@ def registro_usuarios():
   "numDoc":data["numDoc"],
   "userName":data["userName"],
   "password":data["password"]
-  } 
-  create=ref.push(user)  
-  return jsonify({"Mensaje":"Usuario Creado satisfactoriamente","UID":create.key})
+  }
+
+  if(validarExisteUsuario(reference,user)):
+    return jsonify({"Mensaje":"Ya existe un usuario creado con ese documento"})
+  else:
+    create=reference.push(user)
+    return jsonify({"Mensaje":"Usuario Creado satisfactoriamente","UID":create.key})
+
   #jsonify(db.reference("/users").child(create.uid).get())
+
+#metodo validar con una referencia y con una data a almacenar
+# retornando true en caso de que si exista 
 
 @app.route('/product')
 def product():
-  data=db.reference('/product').child('-MvqvI_TTUbrDctEB7Ow').get()
+  data=db.reference('/product')
   return jsonify(data)
+
+
+
+
 
 @app.route('/validar')
 def validar():
@@ -90,7 +156,6 @@ def validar():
 
     for clave in validar:
       if(True):
-
         print(validar[clave])
         
         print(len(db.reference('/product').child('-MvqvI_TTUbrDctEB7Ow').get()))
@@ -98,6 +163,22 @@ def validar():
     validar={"Message":"No hay datos"}
 
   return jsonify(db.reference('/product').child('-MvqvI_TTUbrDctEB7Ow').get())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # @app.route('/users')
 # def users():
 
