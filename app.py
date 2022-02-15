@@ -18,7 +18,7 @@ cors = CORS(app, resources={r"/*": {"origins": "*"}})
 # Fetch the service account key JSON file contents
 key_json=config('KEY')
 
-url = config('URL_CREDENTIALS')
+url = config('URL_CREDENTIALS_FIREBASE')
 headers = {
   'X-Master-Key': key_json
 }
@@ -26,7 +26,7 @@ req = requests.get(url, json=None, headers=headers)
 data=req.json()["record"]
 
 cred = credentials.Certificate(data)
-url=config('URL_FIREBASE_PRUEBAS')
+url=config('URL_FIREBASE')
 
 # #firebase = firebase.FirebaseApplication('https://'+url, None)
 
@@ -39,15 +39,8 @@ firebase_admin.initialize_app(cred, {
 
 @app.route('/')
 def index():
-    # ref=db.reference("/product")
-    # prueba=db.reference('/').child('product').order_by_key().limit_to_last(2).get()
-    # return jsonify(prueba)
-    ref = db.reference("/product")
-    product = ref.get()
-    print(product)
-    for key, value in product.items():
-      print(key, value["message"])
-    return jsonify({"message":"mundo"})
+    alojamientos=db.reference("/alojamientos").order_by_key().limit_to_last(4).get()
+    return jsonify(alojamientos)
 
 #Loguear
 @app.route('/login',methods=['POST'])
@@ -63,18 +56,29 @@ def login():
   
   return jsonify({"id":user.uid,"email":user.email})
 
-#Metodos utiles
+# Tabla Usuarios
 
-def validarExisteUsuario(reference,data):
-    database = reference.get()
-    for key, value in database.items():
-      if(value["numDoc"] == data["numDoc"]):
-        return True
-      else:
-        return False
+@app.route('/registro',methods=['POST'])
+def registroUsuarios():
+  reference=db.reference("/usuarios")
+  data=request.json
+  usuarios={
+  "nombre":data["nombre"],
+  "typeDoc":data["typeDoc"],
+  "numDoc":data["numDoc"],
+  "userName":data["userName"],
+  "password":data["password"]
+  }
 
-#listado de usuarios
-@app.route('/list')
+  if(validarExisteUsuario(reference,usuarios)):
+    return jsonify({"Mensaje":"Ya existe un usuario creado con ese nit"})
+  else:
+    create=reference.push(usuarios)
+    return jsonify({"Mensaje":"usuario Creado satisfactoriamente","UID":create.key})
+
+
+#listado de usuarios con credenciales
+@app.route('/listadoUsuarios')
 def list_usuarios():
   page=auth.list_users()
   data={}
@@ -82,6 +86,7 @@ def list_usuarios():
     data={"user": user.uid}
     user
   return (data)
+
 # Obtener todos los  usuarios
 @app.route('/usuarios')
 def listaUsuarios():
@@ -116,56 +121,30 @@ def eliminarUsuarios():
       else:
         return False     
 
-
-@app.route('/registro',methods=['POST'])
-def registroUsuarios():
-  reference=db.reference("/usuarios")
-  data=request.json
-  usuarios={
-  "nombre":data["nombre"],
-  "typeDoc":data["typeDoc"],
-  "numDoc":data["numDoc"],
-  "userName":data["userName"],
-  "password":data["password"]
-  }
-
-  if(validarExisteAlojamiento(reference,usuarios)):
-    return jsonify({"Mensaje":"Ya existe un usuario creado con ese nit"})
-  else:
-    create=reference.push(usuarios)
-    return jsonify({"Mensaje":"usuario Creado satisfactoriamente","UID":create.key})
-
 #Alojamiento datos
 
-def validarExisteAlojamiento(reference,data):
-    database = reference.get()
-    for key, value in database.items():
-      if(value["numDoc"] == data["numDoc"]):
-        return True
-      else:
-        return False
-
-@app.route('/alojamiento',methods=['POST'])
+@app.route('/registrarEvento',methods=['POST'])
 def registroAlojamientos():
-  reference=db.reference("/usuarios")
+  reference=db.reference("/evento")
   data=request.json
   alojamiento={
-  "nombreAlojamiento":data["nombreAlojamiento"],
-  "nit":data["typeDoc"],
-  "email":data["numDoc"],
-  "telefono":data["userName"],
-  "responsable":data["password"],
-  "categoria":data["password"],
-  "descricion":data["password"],
-  "ciudad":data["password"],
-  "password":data["password"],
+  "tipoEvento":data["tipoEvento"],
+  "descricion":data["descricion"],
+  "fecha":data["fecha"],
+  "hora":data["hora"],
+  "numpax":data["numpax"],
+  "v_unitario":data["v_unitario"],
+  "v_total":data["v_total"],
+  "cliente":data["cliente"],
+  "alojamiento":data["alojamiento"],
+  "proveedor":data["proveedor"]
   }
 
-  if(validarExisteAlojamiento(reference,user)):
-    return jsonify({"Mensaje":"Ya existe un alojamiento creado con ese nit"})
+  if(validarExisteAlojamiento(reference,alojamiento)):
+    return jsonify({"Mensaje":"Ya existe un vento creado con ese nit"})
   else:
     create=reference.push(alojamiento)
-    return jsonify({"Mensaje":"Alojamiento Creado satisfactoriamente","UID":create.key})
+    return jsonify({"Mensaje":"Evento Creado satisfactoriamente","UID":create.key})
 
 #lista de productos
 
@@ -189,8 +168,53 @@ def eliminarAlojamiento():
       else:
         return False     
 
+# Eventos 
 
-  #jsonify(db.reference("/users").child(create.uid).get())
+@app.route('/evento',methods=['POST'])
+def registroEvento():
+  reference=db.reference("/eventos")
+  data=request.json
+  evento={
+  "tipoEvento":data["tipoEvento"],
+  "descricion":data["descricion"],
+  "fecha":data["fecha"],
+  "hora":data["hora"],
+  "numpax":data["numpax"],
+  "v_unitario":data["v_unitario"],
+  "v_total":data["v_total"],
+  "cliente":data["cliente"],
+  "alojamiento":data["alojamiento"],
+  "proveedor":data["proveedor"]
+  }
+
+  if(validarExisteEvento(reference,evento)):
+    return jsonify({"Mensaje":"Ya existe un alojamiento creado con ese nit"})
+  else:
+    create=reference.push(alojamiento)
+    return jsonify({"Mensaje":"Alojamiento Creado satisfactoriamente","UID":create.key})
+
+#lista de productos
+
+@app.route('/actualizarEventos',methods=['PUT'])      
+def actualizarEvento():
+    database = db.reference("/eventos")
+    for key, value in database.items():
+      if(value["alojamiento"] == data["alojamiento"]):
+        database.child(key).update(data)
+        return True
+      else:
+        return False   
+        
+@app.route('/eliminarEventos',methods=['POST'])      
+def eliminarEvento():
+    database = db.reference("/usuarios")
+    for key, value in database.items():
+      if(value["alojamiento"] == data["alojamiento"]):
+        database.child(key).update({})
+        return True
+      else:
+        return False     
+
 
 #metodo validar con una referencia y con una data a almacenar
 # retornando true en caso de que si exista 
@@ -204,7 +228,6 @@ def product():
 def validar():
   validar=db.reference('/product').get()
   if(len(validar)>=1):
-
     for clave in validar:
       if(True):
         print(validar[clave])
@@ -216,48 +239,43 @@ def validar():
   return jsonify(db.reference('/product').child('-MvqvI_TTUbrDctEB7Ow').get())
 
 
+# metodos 
+
+  #jsonify(db.reference("/users").child(create.uid).get()) buscamos por el create uid
+
+def validarExisteUsuario(reference,data):
+    database = reference.get()
+    for key, value in database.items():
+      if(value["numDoc"] == data["numDoc"]):
+        return True
+      else:
+        return False
+
+def validarExisteAlojamiento(reference,data):
+    database = reference.get()
+    if(database):
+      for key, value in database.items():
+        if(value["numDoc"] == data["numDoc"]):
+          return True
+        else:
+          return False
+    else:
+      return False
+
+def validarExisteAlojamiento(reference,data):
+    database = reference.get()
+    if(database):
+      for key, value in database.items():
+        if(value["alojamiento"] == data["alojamiento"]):
+          return True
+        else:
+          return False
+    else:
+      return False
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-# @app.route('/users')
-# def users():
-
-#     users = firebase.get('/users', None)
-#     return jsonify(users)
-
-
-# @app.route('/productos')
-# def productos():
-
-#     users = firebase.get('/product', None)
-#     return jsonify(users)
-
-
-# app.route('/eliminar<string:numDoc>')
-# def delete(numDoc):
-     
-#     data=(firebase.get('/users',None))
-
-#     # for clave in data:
-#     #     if data[clave] == numDoc:
-        
-#     #     firebase.delete('/users',clave)
-    
-#     return jsonify({"message": "User Delete"})
-
-# #actualizar datos
-# #print(firebase.put('/product','-MveibFb9AzLgX3e5JQm"',data2))
+#Correr la Aplicación
 
 if __name__ == '__main__':
     app.run(debug=True)
