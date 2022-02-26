@@ -83,6 +83,19 @@ def registroUsuarios():
     create=reference.push(usuarios)
     return jsonify({"Mensaje":"usuario Creado satisfactoriamente","UID":create.key})
 
+  
+@app.route('/anuncios',methods=['POST'])
+def registroAnuncios():
+  reference=db.reference("/anuncios")
+  data=request.json
+  anuncio={
+  "nombreAnuncio":data["nombreAnuncio"],
+  "descripcion":data["descripcion"],
+  "capacidad":data["capacidad"],
+  "imagen":data["imagen"]
+  }
+  create=reference.push(anuncio)
+  return jsonify({"Mensaje":"anuncio creado"})
 
 #listado de usuarios con credenciales
 @app.route('/listadoUsuarios')
