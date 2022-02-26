@@ -43,18 +43,25 @@ def index():
     return jsonify(alojamientos)
 
 #Loguear
+
 @app.route('/login',methods=['POST'])
 def login():   
   data=request.json
-  usuario=data['usuario']
-  contraseña=data['contraseña']
-  user=auth.get_user_by_email(usuario)
-  if(user):
-    print ("bienvenido")
-  else:
-    user=auth.create_user(email=usuario,password=contraseña)
   
-  return jsonify({"id":user.uid,"email":user.email})
+  email=data['email']
+  password=data['password']
+
+  user=auth.get_user_by_email(email)
+  if(user):
+    usuario=db.reference("/usuarios").child(user.uid).get()
+    token=str(auth.create_custom_token(user.uid,usuario)).split("'")[1]
+    
+    if(usuario["password"]== data["password"]):
+      return jsonify({"token":token})
+    else:
+      return jsonify({"Message":"Contraseña Erronea intente nuevamente"})
+  else:
+    return jsonify({"Message":"Usuario No esta registrado"})
 
 # Tabla Usuarios
 
