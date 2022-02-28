@@ -88,14 +88,14 @@ def registroUsuarios():
 def registroAnuncios():
   reference=db.reference("/anuncios")
   data=request.json
-  anuncio={
+  anuncios={
   "nomAnounce":data["nomAnounce"],
   "description":data["description"],
   "numCapacity":data["numCapacity"],
   "location":data["location"],
   "arrayImages":data["arrayImages"]
   }
-  create=reference.push(anuncio)
+  create=reference.push(anuncios)
   print(request.json)
   return jsonify({"Mensaje":"anuncio creado"})
 
