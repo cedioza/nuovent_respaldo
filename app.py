@@ -96,6 +96,7 @@ def registroAnuncios():
   "arrayImages":data["arrayImages"]
   }
   create=reference.push(anuncio)
+  print(request.json)
   return jsonify({"Mensaje":"anuncio creado"})
 
 #listado de usuarios con credenciales
@@ -211,7 +212,7 @@ def registroEvento():
   if(validarExisteEvento(reference,evento)):
     return jsonify({"Mensaje":"Ya existe un alojamiento creado con ese nit"})
   else:
-    create=reference.push(alojamiento)
+    create=reference.push(evento)
     return jsonify({"Mensaje":"Alojamiento Creado satisfactoriamente","UID":create.key})
 
 #lista de productos
@@ -272,7 +273,7 @@ def validarExisteUsuario(reference,data):
       else:
         return False
 
-def validarExisteAlojamiento(reference,data):
+def validarExisteEvento(reference,data):
     database = reference.get()
     if(database):
       for key, value in database.items():
