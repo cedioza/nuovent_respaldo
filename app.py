@@ -9,10 +9,22 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 from firebase_admin import db
 from firebase_admin import auth ,exceptions
+import cloudinary
+import cloudinary.uploader
+import cloudinary
 
 app = Flask(__name__)
 
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
+
+
+cloudinary.config( 
+  cloud_name = config("CLOUD_NAME"), 
+  api_key = config("API_KEY"), 
+  api_secret = config("API_SECRET_KEY"),
+  secure = True
+)
+
 
 #module key file
 # Fetch the service account key JSON file contents
@@ -78,26 +90,32 @@ def registroUsuarios():
   }
 
   if(validarExisteUsuario(reference,usuarios)):
-    return jsonify({"Mensaje":"Ya existe un usuario creado con ese nit"})
+    return jsonify({"Mensaje":"Ya existe un usuario creado con ese cedula"})
   else:
     create=reference.push(usuarios)
     return jsonify({"Mensaje":"usuario Creado satisfactoriamente","UID":create.key})
 
   
-@app.route('/anuncio',methods=['POST'])
-def registroAnuncios():
-  reference=db.reference("/anuncios")
-  data=request.json
-  anuncios={
-  "nomAnounce":data["nomAnounce"],
-  "description":data["description"],
-  "numCapacity":data["numCapacity"],
-  "location":data["location"],
-  "arrayImages":data["arrayImages"]
-  }
-  create=reference.push(anuncios)
-  print(request.json)
-  return jsonify({"Mensaje":"anuncio creado"})
+# @app.route('/anuncio',methods=['POST'])
+# def registroAnuncios():
+
+
+
+#   # reference=db.reference("/anuncios")
+#   # data=request.json
+#   # anuncios={
+#   # "nomAnounce":data["nomAnounce"],
+#   # "description":data["description"],
+#   # "numCapacity":data["numCapacity"],
+#   # "location":data["location"],
+#   # "arrayImages":data["arrayImages"]
+#   # }
+#   # create=reference.push(anuncios)
+#   # print(request.json["arrayImages"])
+#   # print("arrayImages")
+#   # print(request.json["arrayImages"])
+#   # print(request.json["arrayImages"][0])
+#   return jsonify({"Mensaje":"anuncio creado"})
 
 #listado de usuarios con credenciales
 @app.route('/listadoUsuarios')
@@ -296,6 +314,14 @@ def validarExisteAlojamiento(reference,data):
       return False
 
 
+@app.route('/anuncio',methods=["POST","GET"])
+def pruebaImagen():
+  print(request.files)
+ 
+  resp=cloudinary.uploader.upload(request.files['myFile'])
+  db.reference('/anuncio').push(resp["url"])
+  print(resp)
+  return jsonify(resp["url"])
 
 #Correr la Aplicación
 
