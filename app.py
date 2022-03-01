@@ -324,12 +324,32 @@ def validarExisteAlojamiento(reference,data):
 
 @app.route('/anuncio',methods=["POST","GET"])
 def pruebaImagen():
-  print(request.files)
+  print(request.form)
+  try:
+
+    
+    
+    print( request.files["file1"])
+    print("*"*20)
+    print( request.files["file0"])
+    print("*"*20)
+    print( request.files.get("file3"))
+    print("*"*20)
+    print( request.files.get("file4"))
+    print("*"*20)
+    print( request.files.items)
+    print("-"*20)
+    print( request.files.lists)
+
+      
+
+  except:
+    print("nell pastel")
  
-  resp=cloudinary.uploader.upload(request.files['myFile'])
-  db.reference('/anuncio').push(resp["url"])
-  print(resp)
-  return jsonify(resp["url"])
+  # resp=cloudinary.uploader.upload(request.files['images'])
+  # db.reference('/anuncio').push(resp["url"])
+  # print(resp)
+  return jsonify({"resp":"data"})
 
 #Correr la Aplicación
 
