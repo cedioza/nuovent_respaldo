@@ -49,6 +49,14 @@ firebase_admin.initialize_app(cred, {
 
 # As an admin, the app has access to read and write all data, regradless of Security Rules
 
+cloudinary.config( 
+  cloud_name = config("CLOUD_NAME"), 
+  api_key = config("API_KEY"), 
+  api_secret = config("API_SECRET_KEY"),
+  secure = True
+)
+
+
 @app.route('/')
 def index():
     alojamientos=db.reference("/alojamientos").order_by_key().limit_to_last(4).get()
@@ -163,7 +171,7 @@ def eliminarUsuarios():
 
 #Alojamiento datos
 
-@app.route('/registrarEvento',methods=['POST'])
+@app.route('/registrarEvento',  methods=['POST'])
 def registroAlojamientos():
   reference=db.reference("/evento")
   data=request.json
@@ -207,7 +215,7 @@ def eliminarAlojamiento():
         return True
       else:
         return False     
-
+   
 # Eventos 
 
 @app.route('/evento',methods=['POST'])
@@ -230,7 +238,7 @@ def registroEvento():
   if(validarExisteEvento(reference,evento)):
     return jsonify({"Mensaje":"Ya existe un alojamiento creado con ese nit"})
   else:
-    create=reference.push(evento)
+    create=reference.push(alojamiento)
     return jsonify({"Mensaje":"Alojamiento Creado satisfactoriamente","UID":create.key})
 
 #lista de productos
@@ -291,7 +299,7 @@ def validarExisteUsuario(reference,data):
       else:
         return False
 
-def validarExisteEvento(reference,data):
+def validarExisteAlojamiento(reference,data):
     database = reference.get()
     if(database):
       for key, value in database.items():
@@ -324,6 +332,7 @@ def pruebaImagen():
   return jsonify(resp["url"])
 
 #Correr la Aplicación
+
 
 if __name__ == '__main__':
     app.run(debug=True)
