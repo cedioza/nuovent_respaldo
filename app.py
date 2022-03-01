@@ -9,6 +9,10 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 from firebase_admin import db
 from firebase_admin import auth ,exceptions
+import cloudinary
+import cloudinary.uploader
+import cloudinary
+
 
 app = Flask(__name__)
 
@@ -36,6 +40,14 @@ firebase_admin.initialize_app(cred, {
 })
 
 # As an admin, the app has access to read and write all data, regradless of Security Rules
+
+cloudinary.config( 
+  cloud_name = config("CLOUD_NAME"), 
+  api_key = config("API_KEY"), 
+  api_secret = config("API_SECRET_KEY"),
+  secure = True
+)
+
 
 @app.route('/')
 def index():
@@ -83,21 +95,6 @@ def registroUsuarios():
     create=reference.push(usuarios)
     return jsonify({"Mensaje":"usuario Creado satisfactoriamente","UID":create.key})
 
-  
-@app.route('/anuncio',methods=['POST'])
-def registroAnuncios():
-  reference=db.reference("/anuncios")
-  data=request.json
-  anuncios={
-  "nomAnounce":data["nomAnounce"],
-  "description":data["description"],
-  "numCapacity":data["numCapacity"],
-  "location":data["location"],
-  "arrayImages":data["arrayImages"]
-  }
-  create=reference.push(anuncios)
-  print(request.json)
-  return jsonify({"Mensaje":"anuncio creado"})
 
 #listado de usuarios con credenciales
 @app.route('/listadoUsuarios')
@@ -145,7 +142,7 @@ def eliminarUsuarios():
 
 #Alojamiento datos
 
-@app.route('/registrarEvento',methods=['POST'])
+@app.route('/registrarEvento',  methods=['POST'])
 def registroAlojamientos():
   reference=db.reference("/evento")
   data=request.json
@@ -189,7 +186,7 @@ def eliminarAlojamiento():
         return True
       else:
         return False     
-
+   
 # Eventos 
 
 @app.route('/evento',methods=['POST'])
@@ -212,7 +209,7 @@ def registroEvento():
   if(validarExisteEvento(reference,evento)):
     return jsonify({"Mensaje":"Ya existe un alojamiento creado con ese nit"})
   else:
-    create=reference.push(evento)
+    create=reference.push(alojamiento)
     return jsonify({"Mensaje":"Alojamiento Creado satisfactoriamente","UID":create.key})
 
 #lista de productos
@@ -273,7 +270,7 @@ def validarExisteUsuario(reference,data):
       else:
         return False
 
-def validarExisteEvento(reference,data):
+def validarExisteAlojamiento(reference,data):
     database = reference.get()
     if(database):
       for key, value in database.items():
@@ -296,8 +293,42 @@ def validarExisteAlojamiento(reference,data):
       return False
 
 
+@app.route('/imagenes',methods=["POST","GET"])
+def pruebaImagen():
+  print(request.form)
+  print(request.files)
+
+  resp=cloudinary.uploader.upload(request.files['myFile'])
+  print(resp)
+  return jsonify(resp["url"])
 
 #Correr la Aplicación
+
+
+
+@app.route('/evento',methods=['POST'])
+def registroEvento():
+  reference=db.reference("/eventos")
+  data=request.json
+  evento={
+  "tipoEvento":data["tipoEvento"],
+  "descricion":data["descricion"],
+  "fecha":data["fecha"],
+  "hora":data["hora"],
+  "numpax":data["numpax"],
+  "v_unitario":data["v_unitario"],
+  "v_total":data["v_total"],
+  "cliente":data["cliente"],
+  "alojamiento":data["alojamiento"],
+  "proveedor":data["proveedor"]
+  }
+
+  if(validarExisteEvento(reference,evento)):
+    return jsonify({"Mensaje":"Ya existe un alojamiento creado con ese nit"})
+  else:
+    create=reference.push(alojamiento)
+    return jsonify({"Mensaje":"Alojamiento Creado satisfactoriamente","UID":create.key})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
