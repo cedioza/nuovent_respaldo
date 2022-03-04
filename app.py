@@ -60,8 +60,8 @@ cloudinary.config(
 
 @app.route('/')
 def index():
-    alojamientos=db.reference("/anuncios").order_by_key().limit_to_last(4).get()
-    return jsonify(alojamientos)
+    anuncios=db.reference("/anuncios").order_by_key().limit_to_last(4).get()
+    return jsonify(anuncios)
 
 #Loguear
 
