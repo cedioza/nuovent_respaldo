@@ -131,6 +131,11 @@ def registroAnuncios():
 
   return jsonify({"Mensaje":"anuncio creado"})
 
+
+@app.route("/")
+def index():
+  return jsonify({"Messaje":"Bienvenido API"})
+
 #listado de usuarios con credenciales
 @app.route('/listadoUsuarios')
 def list_usuarios():
