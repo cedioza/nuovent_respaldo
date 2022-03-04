@@ -1,6 +1,7 @@
 from ctypes import util
+from re import U
 from weakref import ref
-from flask import Flask, abort, jsonify,request,redirect
+from flask import Flask, jsonify,request
 from decouple import config
 import firebase_admin
 import requests
@@ -9,14 +10,21 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 from firebase_admin import db
 from firebase_admin import auth ,exceptions
-from datetime import datetime, timedelta
 import cloudinary
 import cloudinary.uploader
-import cloudinary.api
+import cloudinary
+
 app = Flask(__name__)
 
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 
+cloudinary.config( 
+  cloud_name = config("CLOUD_NAME"), 
+  api_key = config("API_KEY"), 
+  api_secret = config("API_SECRET_KEY"),
+  secure = True
+)
 
 
 #module key file
@@ -30,23 +38,6 @@ headers = {
 req = requests.get(url, json=None, headers=headers)
 data=req.json()["record"]
 
-
-cloudinary.config( 
-  cloud_name = config("CLOUD_NAME"), 
-  api_key = config("API_KEY"), 
-  api_secret = config("API_SECRET_KEY"),
-  secure = True
-)
-
-
-@app.route("/imagen",methods=["POST"])
-def enviarImagen():
-  #resp=cloudinary.uploader.upload(request.files['file'])
-  print((request.form['data']))
-  print((request.files['file']))
-  return ({"data":"buenas"})
-
-
 cred = credentials.Certificate(data)
 url=config('URL_FIREBASE')
 
@@ -56,12 +47,21 @@ url=config('URL_FIREBASE')
 firebase_admin.initialize_app(cred, {
     'databaseURL': url,
 })
+
 # As an admin, the app has access to read and write all data, regradless of Security Rules
 
-@app.route('/')
+cloudinary.config( 
+  cloud_name = config("CLOUD_NAME"), 
+  api_key = config("API_KEY"), 
+  api_secret = config("API_SECRET_KEY"),
+  secure = True
+)
+
+
+@app.route('/anuncios')
 def index():
-    alojamientos=db.reference("/alojamientos").order_by_key().limit_to_last(4).get()
-    return jsonify(alojamientos)
+    anuncios=db.reference("/anuncios").order_by_key().limit_to_last(4).get()
+    return jsonify(anuncios)
 
 #Loguear
 
@@ -83,11 +83,11 @@ def login():
       return jsonify({"Message":"Contraseña Erronea intente nuevamente"})
   else:
     return jsonify({"Message":"Usuario No esta registrado"})
+
 # Tabla Usuarios
 
 @app.route('/registro',methods=['POST'])
 def registroUsuarios():
-
   reference=db.reference("/usuarios")
   data=request.json
   usuarios={
@@ -95,20 +95,46 @@ def registroUsuarios():
   "typeDoc":data["typeDoc"],
   "numDoc":data["numDoc"],
   "userName":data["userName"],
-  "email":data["email"],
-  "password":data["password"],
-  "state":1
+  "password":data["password"]
   }
 
   if(validarExisteUsuario(reference,usuarios)):
-    return jsonify({"Mensaje":"Ya existe un usuario creado con ese correo"})
+    return jsonify({"Mensaje":"Ya existe un usuario creado con ese cedula"})
   else:
-    user=auth.create_user(email=data["email"],password=data["password"])
-    reference.update({user.uid:usuarios})
-  
-    #retornamos el uID
-    return jsonify({"Message":"Usuario Creado"})
+    create=reference.push(usuarios)
+    return jsonify({"Mensaje":"usuario Creado satisfactoriamente","UID":create.key})
 
+  
+@app.route('/anuncio',methods=['POST'])
+def registroAnuncios():
+  reference=db.reference("/anuncios")
+  # data=request.json
+  data=request.form
+  imagen=request.files
+  print(imagen)
+  imagenes=[]
+  for i in range(5):
+    if(imagen.get(f"file{i}")):
+      url=cloudinary.uploader.upload(imagen.get(f"file{i}"))
+      imagenes.append(url["url"])
+      # resp=cloudinary.uploader.upload(request.files['images'])
+      # db.reference('/anuncio').push(resp["url"])
+  print(imagenes)   
+  anuncios={
+  "nomAnounce":data["nomAnounce"],
+  "description":data["description"],
+  "numCapacity":data["numCapacity"],
+  "location":data["location"],
+  "arrayImages":imagenes
+  }
+  create=reference.push(anuncios)
+
+  return jsonify({"Mensaje":"anuncio creado"})
+
+
+@app.route("/")
+def index():
+  return jsonify({"Messaje":"Bienvenido API"})
 
 #listado de usuarios con credenciales
 @app.route('/listadoUsuarios')
@@ -127,7 +153,7 @@ def listaUsuarios():
   return jsonify(database)
 
 # Obtener usuario en especifico
-@app.route('/usuarios/<string:uid>')
+@app.route('/usuarios<string:uid>')
 def listaUsuariosUid(uid):
   database = db.reference("/usuarios").child(uid).get()
   return jsonify(database)
@@ -139,51 +165,45 @@ def validarActualizarUsuario():
     database = db.reference("/usuarios")
     for key, value in database.items():
       if(value["numDoc"] == data["numDoc"]):
-        database.child(key).update(data["numDoc"])
+        database.child(key).update(data)
         return True
       else:
         return False   
         
-@app.route('/eliminarUsuario',methods=['DELETE'])      
+@app.route('/eliminarUsuario',methods=['PUT'])      
 def eliminarUsuarios():
-    
     database = db.reference("/usuarios")
-    data=request.json
-    users=database.get()
-    for key, value in users.items():
+    for key, value in database.items():
       if(value["numDoc"] == data["numDoc"]):
-        
-        database.child(key).set({})
-        #auth.disable(key)
+        database.child(key).update({})
         return True
       else:
         return False     
 
 #Alojamiento datos
 
-@app.route('/registrarAlojamiento',methods=['POST'])
+@app.route('/registrarEvento',  methods=['POST'])
 def registroAlojamientos():
-  reference=db.reference("/alojamientos")
-  uid=request.headers["uid"]
+  reference=db.reference("/evento")
   data=request.json
   alojamiento={
-  "nombrealojamiento":data["nombrealojamiento"],
-  "nit":data["nit"],
-  "email":data["email"],
-  "telefono":data["telefono"],
-  "responsable":data["responsable"],
-  "descripcion":data["descripcion"],
-  "ciudad":data["ciudad"],
-  "direccion":data["direccion"],
+  "tipoEvento":data["tipoEvento"],
+  "descricion":data["descricion"],
+  "fecha":data["fecha"],
+  "hora":data["hora"],
+  "numpax":data["numpax"],
+  "v_unitario":data["v_unitario"],
+  "v_total":data["v_total"],
+  "cliente":data["cliente"],
   "alojamiento":data["alojamiento"],
-  "password":data["password"]
+  "proveedor":data["proveedor"]
   }
 
   if(validarExisteAlojamiento(reference,alojamiento)):
     return jsonify({"Mensaje":"Ya existe un vento creado con ese nit"})
   else:
-    create=reference.update({uid:alojamiento})
-    return jsonify({"Mensaje":"Evento Creado satisfactoriamente","UID":uid})
+    create=reference.push(alojamiento)
+    return jsonify({"Mensaje":"Evento Creado satisfactoriamente","UID":create.key})
 
 #lista de productos
 
@@ -206,7 +226,7 @@ def eliminarAlojamiento():
         return True
       else:
         return False     
-
+   
 # Eventos 
 
 @app.route('/evento',methods=['POST'])
@@ -229,7 +249,7 @@ def registroEvento():
   if(validarExisteEvento(reference,evento)):
     return jsonify({"Mensaje":"Ya existe un alojamiento creado con ese nit"})
   else:
-    create=reference.push(evento)
+    create=reference.push(alojamiento)
     return jsonify({"Mensaje":"Alojamiento Creado satisfactoriamente","UID":create.key})
 
 #lista de productos
@@ -237,20 +257,16 @@ def registroEvento():
 @app.route('/actualizarEventos',methods=['PUT'])      
 def actualizarEvento():
     database = db.reference("/eventos")
-    if(database):
-      return False
-    else:
-       for key, value in database.items():
-        if(value["alojamiento"] == data["alojamiento"]):
-          database.child(key).update(data)
-          return True
-        else:
-          return False
-
-
+    for key, value in database.items():
+      if(value["alojamiento"] == data["alojamiento"]):
+        database.child(key).update(data)
+        return True
+      else:
+        return False   
+        
 @app.route('/eliminarEventos',methods=['POST'])      
 def eliminarEvento():
-    database = db.reference("/Eventos")
+    database = db.reference("/usuarios")
     for key, value in database.items():
       if(value["alojamiento"] == data["alojamiento"]):
         database.child(key).update({})
@@ -258,54 +274,6 @@ def eliminarEvento():
       else:
         return False     
 
-#Anuncios 
-
-@app.route('/anuncio',methods=['POST'])
-def registroAnuncio():
-  reference=db.reference("/anuncio")
-  data=request.json
-  anuncio={
-  "nomAnounce":data["nomAnounce"],
-  "description":data["description"],
-  "numCapacity":data["numCapacity"],
-  "location":data["location"],
-  "arrayImages":data["arrayImages"],
-  }
-  create=reference.push(anuncio)
-
-  return jsonify({"message":"anuncio creado satisfactoriamente"})
-
-  # if(validarExisteEvento(reference,evento)):
-  #   return jsonify({"Mensaje":"Ya existe un alojamiento creado con ese nit"})
-  # else:
-  #   create=reference.push(anuncio)
-  #   return jsonify({"Mensaje":"Alojamiento Creado satisfactoriamente","UID":create.key})
-
-#lista de productos
-
-@app.route('/actualizarAnuncios',methods=['PUT'])      
-def actualizarAnuncio():
-    database = db.reference("/anuncios")
-    if(database):
-      return False
-    else:
-       for key, value in database.items():
-        if(value["alojamiento"] == data["alojamiento"]):
-          database.child(key).update(data)
-          return True
-        else:
-          return False
-
-
-@app.route('/eliminarAnuncios',methods=['POST'])      
-def eliminarAnuncio():
-    database = db.reference("/anuncios")
-    for key, value in database.items():
-      if(value["alojamiento"] == data["alojamiento"]):
-        database.child(key).update({})
-        return True
-      else:
-        return False     
 
 #metodo validar con una referencia y con una data a almacenar
 # retornando true en caso de que si exista 
@@ -315,14 +283,34 @@ def product():
   data=db.reference('/product')
   return jsonify(data)
 
+@app.route('/validar')
+def validar():
+  validar=db.reference('/product').get()
+  if(len(validar)>=1):
+    for clave in validar:
+      if(True):
+        print(validar[clave])
+        
+        print(len(db.reference('/product').child('-MvqvI_TTUbrDctEB7Ow').get()))
+  else:
+    validar={"Message":"No hay datos"}
+
+  return jsonify(db.reference('/product').child('-MvqvI_TTUbrDctEB7Ow').get())
+
 
 # metodos 
 
   #jsonify(db.reference("/users").child(create.uid).get()) buscamos por el create uid
 
-
-
 def validarExisteUsuario(reference,data):
+    database = reference.get()
+    for key, value in database.items():
+      if(value["numDoc"] == data["numDoc"]):
+        return True
+      else:
+        return False
+
+def validarExisteAlojamiento(reference,data):
     database = reference.get()
     if(database):
       for key, value in database.items():
@@ -333,30 +321,7 @@ def validarExisteUsuario(reference,data):
     else:
       return False
 
-
-def validarContraseñaUsuario(reference,data):
-    database = reference.get()
-    if(database):
-      for key, value in database.items():
-        if(value["password"] == data["password"]):
-          return True
-        else:
-          return False
-    else:
-      return False
-
 def validarExisteAlojamiento(reference,data):
-    database = reference.get()
-    if(database):
-      for key, value in database.items():
-        if(value["nit"] == data["nit"]):
-          return True
-        else:
-          return False
-    else:
-      return False
-
-def validarExisteEvento(reference,data):
     database = reference.get()
     if(database):
       for key, value in database.items():
@@ -368,48 +333,31 @@ def validarExisteEvento(reference,data):
       return False
 
 
-
-@app.route('/sessionLogin', methods=['POST'])
-def session_login():
-    # Get the ID token sent by the client
-    id_token = request.json['idToken']
-    # Set session expiration to 5 days.
-    expires_in = timedelta(days=5)
-    try:
-        # Create the session cookie. This will also verify the ID token in the process.
-        # The session cookie will have the same claims as the ID token.
-        session_cookie = auth.create_session_cookie(id_token, expires_in=expires_in)
-        response = jsonify({'status': 'success'})
-        # Set cookie policy for session cookie.
-        expires = datetime.datetime.now() + expires_in
-        response.set_cookie(
-            'session', session_cookie, expires=expires, httponly=True, secure=True)
-        return response
-    except exceptions.FirebaseError:
-        return abort(401, 'Failed to create a session cookie')
-
-
-# @app.route('/profile', methods=['POST'])
-# def access_restricted_content():
-#     session_cookie = request.cookies.get('session')
-#     if not session_cookie:
-#         # Session cookie is unavailable. Force user to login.
-#         return redirect('/login')
-
-#     # Verify the session cookie. In this case an additional check is added to detect
-#     # if the user's Firebase session was revoked, user deleted/disabled, etc.
-#     try:
-#         decoded_claims = auth.verify_session_cookie(session_cookie, check_revoked=True)
-#         return serve_content_for_user(decoded_claims)
-#     except auth.InvalidSessionCookieError:
-#         # Session cookie is invalid, expired or revoked. Force user to login.
-#         return redirect('/login')
+# @app.route('/anuncio',methods=["POST"])
+# def pruebaImagen():
+#   print(request.form)
+#   try:
+#     print( request.files["file1"])
+#     print("*"*20)
+#     print( request.files["file0"])
+#     print("*"*20)
+#     print( request.files.get("file3"))
+#     print("*"*20)
+#     print( request.files.get("file4"))
+#     print("*"*20)
+#     print( request.files.items)
+#     print("-"*20)
+#     print( request.files.lists)
+#   except:
+#     print("nell pastel")
+ 
+#   # resp=cloudinary.uploader.upload(request.files['images'])
+#   # db.reference('/anuncio').push(resp["url"])
+#   # print(resp)
+#   return jsonify({"resp":"data"})
 
 #Correr la Aplicación
 
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
