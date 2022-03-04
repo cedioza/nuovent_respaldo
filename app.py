@@ -58,7 +58,7 @@ cloudinary.config(
 )
 
 
-@app.route('/')
+@app.route('/anuncios')
 def index():
     anuncios=db.reference("/anuncios").order_by_key().limit_to_last(4).get()
     return jsonify(anuncios)
