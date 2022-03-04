@@ -1,4 +1,5 @@
 from ctypes import util
+from re import U
 from weakref import ref
 from flask import Flask, jsonify,request
 from decouple import config
@@ -59,7 +60,7 @@ cloudinary.config(
 
 @app.route('/')
 def index():
-    alojamientos=db.reference("/alojamientos").order_by_key().limit_to_last(4).get()
+    alojamientos=db.reference("/anuncios").order_by_key().limit_to_last(4).get()
     return jsonify(alojamientos)
 
 #Loguear
@@ -104,26 +105,31 @@ def registroUsuarios():
     return jsonify({"Mensaje":"usuario Creado satisfactoriamente","UID":create.key})
 
   
-# @app.route('/anuncio',methods=['POST'])
-# def registroAnuncios():
+@app.route('/anuncio',methods=['POST'])
+def registroAnuncios():
+  reference=db.reference("/anuncios")
+  # data=request.json
+  data=request.form
+  imagen=request.files
+  print(imagen)
+  imagenes=[]
+  for i in range(5):
+    if(imagen.get(f"file{i}")):
+      url=cloudinary.uploader.upload(imagen.get(f"file{i}"))
+      imagenes.append(url["url"])
+      # resp=cloudinary.uploader.upload(request.files['images'])
+      # db.reference('/anuncio').push(resp["url"])
+  print(imagenes)   
+  anuncios={
+  "nomAnounce":data["nomAnounce"],
+  "description":data["description"],
+  "numCapacity":data["numCapacity"],
+  "location":data["location"],
+  "arrayImages":imagenes
+  }
+  create=reference.push(anuncios)
 
-
-
-#   # reference=db.reference("/anuncios")
-#   # data=request.json
-#   # anuncios={
-#   # "nomAnounce":data["nomAnounce"],
-#   # "description":data["description"],
-#   # "numCapacity":data["numCapacity"],
-#   # "location":data["location"],
-#   # "arrayImages":data["arrayImages"]
-#   # }
-#   # create=reference.push(anuncios)
-#   # print(request.json["arrayImages"])
-#   # print("arrayImages")
-#   # print(request.json["arrayImages"])
-#   # print(request.json["arrayImages"][0])
-#   return jsonify({"Mensaje":"anuncio creado"})
+  return jsonify({"Mensaje":"anuncio creado"})
 
 #listado de usuarios con credenciales
 @app.route('/listadoUsuarios')
@@ -322,34 +328,28 @@ def validarExisteAlojamiento(reference,data):
       return False
 
 
-@app.route('/anuncio',methods=["POST","GET"])
-def pruebaImagen():
-  print(request.form)
-  try:
-
-    
-    
-    print( request.files["file1"])
-    print("*"*20)
-    print( request.files["file0"])
-    print("*"*20)
-    print( request.files.get("file3"))
-    print("*"*20)
-    print( request.files.get("file4"))
-    print("*"*20)
-    print( request.files.items)
-    print("-"*20)
-    print( request.files.lists)
-
-      
-
-  except:
-    print("nell pastel")
+# @app.route('/anuncio',methods=["POST"])
+# def pruebaImagen():
+#   print(request.form)
+#   try:
+#     print( request.files["file1"])
+#     print("*"*20)
+#     print( request.files["file0"])
+#     print("*"*20)
+#     print( request.files.get("file3"))
+#     print("*"*20)
+#     print( request.files.get("file4"))
+#     print("*"*20)
+#     print( request.files.items)
+#     print("-"*20)
+#     print( request.files.lists)
+#   except:
+#     print("nell pastel")
  
-  # resp=cloudinary.uploader.upload(request.files['images'])
-  # db.reference('/anuncio').push(resp["url"])
-  # print(resp)
-  return jsonify({"resp":"data"})
+#   # resp=cloudinary.uploader.upload(request.files['images'])
+#   # db.reference('/anuncio').push(resp["url"])
+#   # print(resp)
+#   return jsonify({"resp":"data"})
 
 #Correr la Aplicación
 
