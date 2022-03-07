@@ -18,7 +18,6 @@ app = Flask(__name__)
 
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
-
 cloudinary.config( 
   cloud_name = config("CLOUD_NAME"), 
   api_key = config("API_KEY"), 
@@ -57,26 +56,22 @@ cloudinary.config(
   secure = True
 )
 
-
-@app.route('/anuncios')
-def index():
+@app.route('/home')
+def anuncios():
     anuncios=db.reference("/anuncios").order_by_key().limit_to_last(4).get()
     return jsonify(anuncios)
-
 #Loguear
 
 @app.route('/login',methods=['POST'])
 def login():   
   data=request.json
-  
   email=data['email']
   password=data['password']
-
   user=auth.get_user_by_email(email)
+  #hacer validación 
   if(user):
     usuario=db.reference("/usuarios").child(user.uid).get()
     token=str(auth.create_custom_token(user.uid,usuario)).split("'")[1]
-    
     if(usuario["password"]== data["password"]):
       return jsonify({"token":token})
     else:
@@ -97,7 +92,6 @@ def registroUsuarios():
   "userName":data["userName"],
   "password":data["password"]
   }
-
   if(validarExisteUsuario(reference,usuarios)):
     return jsonify({"Mensaje":"Ya existe un usuario creado con ese cedula"})
   else:
@@ -130,7 +124,6 @@ def registroAnuncios():
   create=reference.push(anuncios)
 
   return jsonify({"Mensaje":"anuncio creado"})
-
 
 @app.route("/")
 def index():
@@ -182,24 +175,23 @@ def eliminarUsuarios():
 
 #Alojamiento datos
 
-@app.route('/registrarEvento',  methods=['POST'])
+@app.route('/registrarAlojamiento',  methods=['POST'])
 def registroAlojamientos():
-  reference=db.reference("/evento")
+  reference=db.reference("/alojamientos")
   data=request.json
   alojamiento={
-  "tipoEvento":data["tipoEvento"],
-  "descricion":data["descricion"],
-  "fecha":data["fecha"],
-  "hora":data["hora"],
-  "numpax":data["numpax"],
-  "v_unitario":data["v_unitario"],
-  "v_total":data["v_total"],
-  "cliente":data["cliente"],
-  "alojamiento":data["alojamiento"],
+  "nombrealojamiento":data["nombrealojamiento"],
+  "nit":data["nit"],
+  "email":data["email"],
+  "telefono":data["telefono"],
+  "responsable":data["responsable"],
+  "categoria":data["categoria"],
+  "descripcion":data["descripcion"],
+  "ciudad":data["ciudad"],
+  "direccion":data["direccion"],
   "proveedor":data["proveedor"]
   }
-
-  if(validarExisteAlojamiento(reference,alojamiento)):
+  if(validarExisteEvento(reference,alojamiento)):
     return jsonify({"Mensaje":"Ya existe un vento creado con ese nit"})
   else:
     create=reference.push(alojamiento)
@@ -226,8 +218,13 @@ def eliminarAlojamiento():
         return True
       else:
         return False     
-   
 # Eventos 
+
+@app.route('/zonaevento')
+def zonaEvento():
+  eventos=db.reference("/eventos").get()
+  return jsonify(anuncios)
+
 
 @app.route('/evento',methods=['POST'])
 def registroEvento():
@@ -235,7 +232,7 @@ def registroEvento():
   data=request.json
   evento={
   "tipoEvento":data["tipoEvento"],
-  "descricion":data["descricion"],
+  "descripcion":data["descripcion"],
   "fecha":data["fecha"],
   "hora":data["hora"],
   "numpax":data["numpax"],
@@ -249,7 +246,7 @@ def registroEvento():
   if(validarExisteEvento(reference,evento)):
     return jsonify({"Mensaje":"Ya existe un alojamiento creado con ese nit"})
   else:
-    create=reference.push(alojamiento)
+    create=reference.push(evento)
     return jsonify({"Mensaje":"Alojamiento Creado satisfactoriamente","UID":create.key})
 
 #lista de productos
@@ -278,6 +275,7 @@ def eliminarEvento():
 #metodo validar con una referencia y con una data a almacenar
 # retornando true en caso de que si exista 
 
+
 @app.route('/product')
 def product():
   data=db.reference('/product')
@@ -290,13 +288,10 @@ def validar():
     for clave in validar:
       if(True):
         print(validar[clave])
-        
         print(len(db.reference('/product').child('-MvqvI_TTUbrDctEB7Ow').get()))
   else:
     validar={"Message":"No hay datos"}
-
   return jsonify(db.reference('/product').child('-MvqvI_TTUbrDctEB7Ow').get())
-
 
 # metodos 
 
@@ -321,11 +316,11 @@ def validarExisteAlojamiento(reference,data):
     else:
       return False
 
-def validarExisteAlojamiento(reference,data):
+def validarExisteEvento(reference,data):
     database = reference.get()
     if(database):
       for key, value in database.items():
-        if(value["alojamiento"] == data["alojamiento"]):
+        if(value["cliente"] == data["cliente"]):
           return True
         else:
           return False
