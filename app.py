@@ -60,7 +60,13 @@ cloudinary.config(
 @app.route('/home')
 def anuncios():
     anuncios=db.reference("/anuncios").order_by_key().limit_to_last(4).get()
-    return jsonify(anuncios)
+    # for key, value in anuncios.items():
+    #   print (value)
+    # anuncios.values
+    datos=anuncios.values()
+    
+    
+    return jsonify(list(datos))
 #Loguear
 
 @app.route('/login',methods=['POST'])
