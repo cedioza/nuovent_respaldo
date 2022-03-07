@@ -56,6 +56,7 @@ cloudinary.config(
   secure = True
 )
 
+#Ver  solamente 4 anuncios  /home
 @app.route('/home')
 def anuncios():
     anuncios=db.reference("/anuncios").order_by_key().limit_to_last(4).get()
@@ -127,7 +128,8 @@ def registroAnuncios():
 
 @app.route("/")
 def index():
-  return jsonify({"Messaje":"Bienvenido API"})
+  return jsonify({"Message":"""Ver  solamente 4 anuncios  /home
+  Trae todos los eventos /zonaevento """})
 
 #listado de usuarios con credenciales
 @app.route('/listadoUsuarios')
