@@ -225,7 +225,7 @@ def eliminarAlojamiento():
 @app.route('/zonaevento')
 def zonaEvento():
   eventos=db.reference("/eventos").get()
-  return jsonify(anuncios)
+  return jsonify(eventos)
 
 
 @app.route('/evento',methods=['POST'])
