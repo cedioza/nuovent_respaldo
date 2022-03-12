@@ -113,7 +113,7 @@ def registroUsuarios():
   
 @app.route('/anuncio',methods=['POST'])
 def registroAnuncios():
-  reference=db.reference("/anuncios")
+  reference=db.reference("/anunciosP")
   # data=request.json
   data=request.form
   imagen=request.files
@@ -123,6 +123,7 @@ def registroAnuncios():
     if(imagen.get(f"file{i}")):
       url=cloudinary.uploader.upload(imagen.get(f"file{i}"))
       imagenes.append(url["url"])
+      
   print(imagenes)   
   anuncios={
   "nomAnounce":data["nomAnounce"],
