@@ -79,9 +79,8 @@ def login():
     
     usuario=db.reference("/usuarios").child(user.uid).get()
     print(usuario)
-    print(usuario["password"])
+    
 
-   
     if(usuario["password"]== password):
       token=str(auth.create_custom_token(user.uid,usuario)).split("'")[1]
       return jsonify({"token":token})
@@ -108,8 +107,8 @@ def registroUsuarios():
     return jsonify({"Mensaje":"Ya existe un usuario creado con ese cedula"})
   else:
     create=auth.create_user(email=data["email"],password=data["password"])
-    reference.child(create.uid).set({create.uid:usuarios})
-    return jsonify({"Mensaje":"usuario Creado satisfactoriamente","UID":{data["email"]}})
+    reference.child(create.uid).set(usuarios)
+    return jsonify({"Mensaje":"usuario Creado satisfactoriamente","UID":create.uid})
 
   
 @app.route('/anuncio',methods=['POST'])
@@ -314,12 +313,14 @@ def validar():
 
 def validarExisteUsuario(reference,data):
     database = reference.get()
-    for key, value in database.items():
-      if(value["numDoc"] == data["numDoc"]):
-        return True
-      else:
-        return False
-
+    if(database):
+      for key, value in database.items():
+        if(value["numDoc"] == data["numDoc"]):
+          return True
+        else:
+          return False
+    else:
+      return False
 def validarExisteAlojamiento(reference,data):
     database = reference.get()
     if(database):
