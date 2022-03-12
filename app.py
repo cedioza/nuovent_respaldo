@@ -113,7 +113,7 @@ def registroUsuarios():
   
 @app.route('/anuncio',methods=['POST'])
 def registroAnuncios():
-  reference=db.reference("/anunciosP")
+  reference=db.reference("/anuncios")
   # data=request.json
   data=request.form
   imagen=request.files
