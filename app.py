@@ -344,20 +344,20 @@ def validarExisteEvento(reference,data):
 
 #Correr la Aplicación
 
-def sendEmail(email):
-  message = Mail(
-    from_email='cedioza@misena.edu.co',
-    to_emails=[email,'flaskemail2022@gmail.com'],
-    subject='Sending with Twilio SendGrid is Fun',
-    html_content="""""")
-  try:
-    sg = SendGridAPIClient(Config("KEY_SENDGRID"))
-    response = sg.send(message)
-    print(response.status_code)
-    print(response.body)
-    print(response.headers)
-  except Exception as e:
-    print(e.body)
+# def sendEmail(email):
+#   message = Mail(
+#     from_email='cedioza@misena.edu.co',
+#     to_emails=[email,'flaskemail2022@gmail.com'],
+#     subject='Sending with Twilio SendGrid is Fun',
+#     html_content="""""")
+#   try:
+#     sg = SendGridAPIClient(Config("KEY_SENDGRID"))
+#     response = sg.send(message)
+#     print(response.status_code)
+#     print(response.body)
+#     print(response.headers)
+#   except Exception as e:
+#     print(e.body)
 
 if __name__ == '__main__':
     app.run(debug=True)
