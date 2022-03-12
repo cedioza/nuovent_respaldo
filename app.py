@@ -108,8 +108,8 @@ def registroUsuarios():
     return jsonify({"Mensaje":"Ya existe un usuario creado con ese cedula"})
   else:
     create=auth.create_user(email=data["email"],password=data["password"])
-    reference.set({create.uid:usuarios})
-    return jsonify({"Mensaje":"usuario Creado satisfactoriamente","UID":""})
+    reference.child(create.uid).set({create.uid:usuarios})
+    return jsonify({"Mensaje":"usuario Creado satisfactoriamente","UID":{data["email"]}})
 
   
 @app.route('/anuncio',methods=['POST'])
