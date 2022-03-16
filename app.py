@@ -101,7 +101,8 @@ def registroUsuarios():
   "numDoc":data["numDoc"],
   "userName":data["userName"],
   "password":data["password"],
-  "email":data["email"]
+  "email":data["email"],
+  "state":"1"
   }
   if(validarExisteUsuario(reference,usuarios)):
     return jsonify({"Mensaje":"Ya existe un usuario creado con ese cedula"})
