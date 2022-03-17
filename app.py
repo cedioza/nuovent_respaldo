@@ -118,12 +118,14 @@ def registroAnuncios():
   # data=request.json
   data=request.form
   imagen=request.files
+  
+  print(len(imagen))
   print(imagen)
   imagenes=[]
-  for i in range(5):
-    if(imagen.get(f"file{i}")):
-      url=cloudinary.uploader.upload(imagen.get(f"file{i}"))
-      imagenes.append(url["url"])
+  # for i in range(5):
+  #   if(imagen.get(f"file{i}")):
+  #     url=cloudinary.uploader.upload(imagen.get(f"file{i}"))
+  #     imagenes.append(url["url"])
       
   print(imagenes)   
   anuncios={
@@ -131,10 +133,14 @@ def registroAnuncios():
   "description":data["description"],
   "numCapacity":data["numCapacity"],
   "location":data["location"],
-  "arrayImages":imagenes
+  # "arrayImages":imagenes
   }
 
+  for i in range(1,len(imagen)+1):
 
+    if(imagen.get(f"file{i}")):
+      url=cloudinary.uploader.upload(imagen.get(f"file{i}"))
+      anuncios[f"picture{i}"]= url["url"]
 
   reference.push(anuncios)
 
