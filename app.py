@@ -1,6 +1,7 @@
 from ctypes import util
 from re import U
 from weakref import ref
+from xmlrpc.client import boolean
 from flask import Config, Flask, jsonify,request
 from decouple import config
 import firebase_admin
@@ -73,14 +74,10 @@ def login():
   email=data['email']
   password=data['password']
   user=auth.get_user_by_email(email)
-
   #hacer validación 
   if(user):
-    
     usuario=db.reference("/usuarios").child(user.uid).get()
     print(usuario)
-    
-
     if(usuario["password"]== password):
       token=str(auth.create_custom_token(user.uid,usuario)).split("'")[1]
       return jsonify({"token":token})
@@ -102,16 +99,24 @@ def registroUsuarios():
   "userName":data["userName"],
   "password":data["password"],
   "email":data["email"],
+  "telephone":data["telephone"],
   "state":"1"
   }
-  if(validarExisteUsuario(reference,usuarios)):
-    return jsonify({"Mensaje":"Ya existe un usuario creado con ese cedula"})
-  else:
-    create=auth.create_user(email=data["email"],password=data["password"])
-    reference.child(create.uid).set(usuarios)
-    return jsonify({"Mensaje":"usuario Creado satisfactoriamente","UID":create.uid})
+   
+  try:
+    if(validarExisteUsuario(reference,usuarios)):
+      return jsonify({"Mensaje":"Ya existe un usuario creado con ese cedula"})
+    else:
+      create=auth.create_user(email=data["email"],password=data["password"])
+      reference.child(create.uid).set(usuarios)
+      #verify=auth.generate_email_verification_link(email=data["email"])
+      #print(verify)
+      return jsonify({"Mensaje":"usuario Creado satisfactoriamente","UID":create.uid})
+  except auth.EmailAlreadyExistsError:
+    return jsonify({"Mensaje":"Ya existe un usuario creado con ese correo"})
 
-  
+
+
 @app.route('/anuncio',methods=['POST'])
 def registroAnuncios():
   reference=db.reference("/anuncios")
@@ -133,7 +138,7 @@ def registroAnuncios():
   "description":data["description"],
   "numCapacity":data["numCapacity"],
   "location":data["location"],
-  # "arrayImages":imagenes
+  "available":data["available"],
   }
 
   for i in range(1,len(imagen)+1):
@@ -150,6 +155,8 @@ def registroAnuncios():
 def index():
   return jsonify({"Message":"""Ver  solamente 4 anuncios  /home
   Trae todos los eventos /zonaevento """})
+
+
 
 #listado de usuarios con credenciales
 @app.route('/listadoUsuarios')
@@ -248,6 +255,12 @@ def zonaEvento():
   return jsonify(eventos)
 
 
+@app.route('/zonaAnuncios')
+def zonaEvento():
+  eventos=db.reference("/anuncios").get()
+  return jsonify(eventos)
+
+
 @app.route('/evento',methods=['POST'])
 def registroEvento():
   reference=db.reference("/eventos")
@@ -325,10 +338,8 @@ def validarExisteUsuario(reference,data):
       for key, value in database.items():
         if(value["numDoc"] == data["numDoc"]):
           return True
-        else:
-          return False
-    else:
-      return False
+
+    return False
 def validarExisteAlojamiento(reference,data):
     database = reference.get()
     if(database):
