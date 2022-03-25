@@ -255,11 +255,10 @@ def zonaEvento():
   return jsonify(eventos)
 
 
-@app.route('/zonaAnuncios')
+@app.route('/anuncios')
 def zonaEvento():
   eventos=db.reference("/anuncios").get()
   return jsonify(eventos)
-
 
 @app.route('/evento',methods=['POST'])
 def registroEvento():
