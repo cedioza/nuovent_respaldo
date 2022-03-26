@@ -138,7 +138,7 @@ def registroAnuncios():
   "description":data["description"],
   "numCapacity":data["numCapacity"],
   "location":data["location"],
-  "available":data["available"],
+  "available":"available",
   }
 
   for i in range(1,len(imagen)+1):
