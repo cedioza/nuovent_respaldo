@@ -258,12 +258,15 @@ def zonaEvento():
 @app.route('/anuncios')
 def zona_anuncios():
   anuncios=db.reference("/anuncios").get()
-  return jsonify(anuncios)
+  return jsonify(list(anuncios))
+  
 
 @app.route('/evento',methods=['POST'])
 def registroEvento():
   reference=db.reference("/eventos")
   data=request.json
+
+  request.headers["nombre de la cabecera "]
   evento={
   "tipoEvento":data["tipoEvento"],
   "descripcion":data["descripcion"],
