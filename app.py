@@ -62,7 +62,7 @@ cloudinary.config(
 #Ver  solamente 4 anuncios  /home
 @app.route('/home')
 def anuncios():
-    anuncios=db.reference("/anuncios").order_by_key().limit_to_last(4).get()
+    anuncios=db.reference("/anuncios").order_by_key().limit_to_last(6).get()
     datos=anuncios.values()
     return jsonify(list(datos))
 
