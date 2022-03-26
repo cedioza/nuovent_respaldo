@@ -99,7 +99,7 @@ def registroUsuarios():
   "userName":data["userName"],
   "password":data["password"],
   "email":data["email"],
-  "telephone":data["telephone"],
+  "phone":data["phone"],
   "state":"1"
   }
    
