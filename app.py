@@ -144,7 +144,6 @@ def registroAnuncios():
         url=cloudinary.uploader.upload(imagen.get(f"file{i}"))
         anuncios[f"picture{i}"]= url["url"]
     reference.push(anuncios)
-    sendEmail("cedioza@gmail.com",data["nomAnounce"],2)
     return jsonify({"Mensaje":"anuncio creado"})
   except Exception as e:
     return jsonify({"Error :":e})
