@@ -1,7 +1,3 @@
-from ctypes import util
-from re import U
-from weakref import ref
-from xmlrpc.client import boolean
 from flask import Config, Flask, jsonify,request
 from decouple import config
 import firebase_admin
@@ -14,7 +10,6 @@ from firebase_admin import auth ,exceptions
 import cloudinary
 import cloudinary.uploader
 import cloudinary
-
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
@@ -22,17 +17,15 @@ app = Flask(__name__)
 
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
+# Inicializar Cloudinary
 cloudinary.config( 
   cloud_name = config("CLOUD_NAME"), 
   api_key = config("API_KEY"), 
   api_secret = config("API_SECRET_KEY"),
   secure = True
 )
-
-#module key file
-# Fetch the service account key JSON file contents
+# Inicializar JSONBin
 key_json=config('KEY')
-
 url = config('URL_CREDENTIALS_FIREBASE')
 headers = {
   'X-Master-Key': key_json
@@ -40,33 +33,50 @@ headers = {
 req = requests.get(url, json=None, headers=headers)
 data=req.json()["record"]
 
+# Credenciales Firebase
 cred = credentials.Certificate(data)
 url=config('URL_FIREBASE')
 
-# #firebase = firebase.FirebaseApplication('https://'+url, None)
-
-# # Initialize the app with a service account, granting admin privileges
+#Inicializar Firebase
 firebase_admin.initialize_app(cred, {
     'databaseURL': url,
 })
 
-# As an admin, the app has access to read and write all data, regradless of Security Rules
+# API Email SendGrid
 
-cloudinary.config( 
-  cloud_name = config("CLOUD_NAME"), 
-  api_key = config("API_KEY"), 
-  api_secret = config("API_SECRET_KEY"),
-  secure = True
-)
+def sendEmail(email,name,case):
+  
+  if case==1:
+    subject=f'Bienvenido a Nuovent {name} '
+    content='<strong>Bienvenido  ahora podras crear nuevos anuncios o alojamientos </strong>'
+  else:
+   subject=f'Nuevo anuncio creado'
+   content=f'<strong> Se creo un nuevo anuncio {name} </strong>'
 
-#Ver  solamente 4 anuncios  /home
+  message = Mail(
+    from_email='cedioza@misena.edu.co',
+    to_emails=email,
+    subject=subject,
+    html_content=content)
+  try:
+      sg = SendGridAPIClient(config('KEY_SENDGRID'))
+      response = sg.send(message)
+      print(response.status_code)
+      print(response.body)
+      print(response.headers)
+  except Exception as e:
+      print(e)
+
+
+
+# Home
 @app.route('/home')
 def anuncios():
     anuncios=db.reference("/anuncios").order_by_key().limit_to_last(6).get()
     datos=anuncios.values()
     return jsonify(list(datos))
 
-#Loguear
+#Login Usuario
 
 @app.route('/login',methods=['POST'])
 def login():   
@@ -74,7 +84,7 @@ def login():
   email=data['email']
   password=data['password']
   user=auth.get_user_by_email(email)
-  #hacer validación 
+  #Validación sí existe usuario 
   if(user):
     usuario=db.reference("/usuarios").child(user.uid).get()
     print(usuario)
@@ -86,7 +96,7 @@ def login():
   else:
     return jsonify({"Message":"Usuario No esta registrado"})
 
-# Tabla Usuarios
+# Registro Usuarios
 
 @app.route('/registro',methods=['POST'])
 def registroUsuarios():
@@ -101,62 +111,52 @@ def registroUsuarios():
   "email":data["email"],
   "phone":data["phone"],
   "state":"1"
-  }
-   
+  }  
   try:
     if(validarExisteUsuario(reference,usuarios)):
       return jsonify({"Mensaje":"Ya existe un usuario creado con ese cedula"})
     else:
       create=auth.create_user(email=data["email"],password=data["password"])
       reference.child(create.uid).set(usuarios)
-      #verify=auth.generate_email_verification_link(email=data["email"])
-      #print(verify)
+      sendEmail(data["email"],data["nombre"],1)
       return jsonify({"Mensaje":"usuario Creado satisfactoriamente","UID":create.uid})
   except auth.EmailAlreadyExistsError:
     return jsonify({"Mensaje":"Ya existe un usuario creado con ese correo"})
-
-
+    
+#Crear Anuncio
 
 @app.route('/anuncio',methods=['POST'])
 def registroAnuncios():
   reference=db.reference("/anuncios")
-  # data=request.json
-  data=request.form
-  imagen=request.files
-  
-  print(len(imagen))
-  print(imagen)
-  imagenes=[]
-  # for i in range(5):
-  #   if(imagen.get(f"file{i}")):
-  #     url=cloudinary.uploader.upload(imagen.get(f"file{i}"))
-  #     imagenes.append(url["url"])
-      
-  print(imagenes)   
-  anuncios={
-  "nomAnounce":data["nomAnounce"],
-  "description":data["description"],
-  "numCapacity":data["numCapacity"],
-  "location":data["location"],
-  "available":"available",
-  }
+  try:
+    data=request.form
+    imagen=request.files 
+    anuncios={
+    "nomAnounce":data["nomAnounce"],
+    "description":data["description"],
+    "numCapacity":data["numCapacity"],
+    "location":data["location"],
+    "available":"available",
+    }
 
-  for i in range(1,len(imagen)+1):
+    for i in range(1,len(imagen)+1):
+      if(imagen.get(f"file{i}")):
+        url=cloudinary.uploader.upload(imagen.get(f"file{i}"))
+        anuncios[f"picture{i}"]= url["url"]
+    reference.push(anuncios)
+    sendEmail("cedioza@gmail.com",data["nomAnounce"],2)
+    return jsonify({"Mensaje":"anuncio creado"})
+  except Exception as e:
+    return jsonify({"Error :":e})
 
-    if(imagen.get(f"file{i}")):
-      url=cloudinary.uploader.upload(imagen.get(f"file{i}"))
-      anuncios[f"picture{i}"]= url["url"]
 
-  reference.push(anuncios)
 
-  return jsonify({"Mensaje":"anuncio creado"})
-
+#Documentacion Relacionada Postman
 @app.route("/")
+
 def index():
   return jsonify({"Message":"""Ver  solamente 4 anuncios  /home
   Trae todos los eventos /zonaevento """})
-
-
 
 #listado de usuarios con credenciales
 @app.route('/listadoUsuarios')
