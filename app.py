@@ -54,7 +54,7 @@ def sendEmail(email,name,case):
    content=f'<strong> Se creo un nuevo anuncio {name} </strong>'
 
   message = Mail(
-    from_email='cedioza@misena.edu.co',
+    from_email='cedioza@gmail.com',
     to_emails=email,
     subject=subject,
     html_content=content)
