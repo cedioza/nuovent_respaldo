@@ -150,7 +150,8 @@ def registroAnuncios():
     reference.push(anuncios)
 
     return jsonify({"Mensaje":"Anuncio creado"})
-  except :
+  except Exception as  e:
+    reference=db.reference("/error").push(e)
     return jsonify({"Mensaje":"Error creando anuncio"})
 
 #Documentacion Relacionada Postman
