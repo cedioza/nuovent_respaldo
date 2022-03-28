@@ -149,10 +149,9 @@ def registroAnuncios():
         anuncios[f"picture{i}"]= url["url"]
     reference.push(anuncios)
 
-    return jsonify({"Mensaje":"anuncio creado"})
-  except Exception as e:
-    print(e)
-    return jsonify(e)
+    return jsonify({"Mensaje":"Anuncio creado"})
+  except :
+    return jsonify({"Mensaje":"Error creando anuncio"})
 
 #Documentacion Relacionada Postman
 @app.route("/")
