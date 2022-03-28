@@ -151,7 +151,8 @@ def registroAnuncios():
 
     return jsonify({"Mensaje":"anuncio creado"})
   except Exception as e:
-    return jsonify({"Mensaje":e})
+    print(e)
+    return jsonify(e)
 
 #Documentacion Relacionada Postman
 @app.route("/")
