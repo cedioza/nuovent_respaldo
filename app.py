@@ -127,26 +127,31 @@ def registroUsuarios():
 
 @app.route('/anuncio',methods=['POST'])
 def registroAnuncios():
-  reference=db.reference("/anuncios")
-  data=request.form
-  imagen=request.files 
-  anuncios={
-  "nomAnounce":data["nomAnounce"],
-  "description":data["description"],
-  "numCapacity":data["numCapacity"],
-  "location":data["location"],
-  "available":"available"
-  }
-
-  for i in range(1,len(imagen)+1):
-    if(imagen.get(f"file{i}")):
-      url=cloudinary.uploader.upload(imagen.get(f"file{i}"))
-      anuncios[f"picture{i}"]= url["url"]
-  reference.push(anuncios)
-  return jsonify({"Mensaje":"anuncio creado"})
 
 
+  try:
 
+    
+    reference=db.reference("/anuncios")
+    data=request.form
+    imagen=request.files 
+    anuncios={
+    "nomAnounce":data["nomAnounce"],
+    "description":data["description"],
+    "numCapacity":data["numCapacity"],
+    "location":data["location"],
+    "available":"available"
+    }
+
+    for i in range(1,len(imagen)+1):
+      if(imagen.get(f"file{i}")):
+        url=cloudinary.uploader.upload(imagen.get(f"file{i}"))
+        anuncios[f"picture{i}"]= url["url"]
+    reference.push(anuncios)
+
+    return jsonify({"Mensaje":"anuncio creado"})
+  except Exception as e:
+    return jsonify({"Mensaje":e})
 
 #Documentacion Relacionada Postman
 @app.route("/")
