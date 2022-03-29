@@ -272,8 +272,8 @@ def zonaEvento():
 @app.route('/anuncios')
 def zona_anuncios():
   anuncios=db.reference("/anuncios").get()
-  datos=anuncios.values()
-  return jsonify(list(datos))
+  datos=anuncios.items()
+  return jsonify((datos))
 
   
   
