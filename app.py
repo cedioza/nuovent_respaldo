@@ -73,7 +73,8 @@ def sendEmail(email,name,case):
 @app.route('/home')
 def anuncios():
     anuncios=db.reference("/anuncios").order_by_key().limit_to_last(6).get()
-    datos=anuncios.values()
+    datos=anuncios.items()
+    # datos=anuncios.values()
     return jsonify(list(datos))
 
 #Login Usuario
@@ -123,12 +124,41 @@ def registroUsuarios():
   except auth.EmailAlreadyExistsError:
     return jsonify({"Mensaje":"Ya existe un usuario creado con ese correo"})
     
+
+#Buscar Anuncion
+@app.route('/obtenerAnuncio/<string:uid>')
+def obtenerAnuncio(uid):
+  alojamiento=reference=db.reference("/alojamiento").child(uid).get()
+  print(alojamiento["anuncio"])
+
+  # anuncios=alojamiento["anuncio"]
+  #para cuando sea un arreglo
+
+  database=reference=db.reference("/anuncios").child(alojamiento["anuncio"]).get()
+  if(database):
+    for key, value in database.items():
+        if(value["description"] == data["numDoc"]):
+          return True
+    
+
+
+  
+  # def validarExisteUsuario(reference,data):
+  #   database = reference.get()
+  #   if(database):
+  #     for key, value in database.items():
+  #       if(value["numDoc"] == data["numDoc"]):
+  #         return True
+
+
+  #recororr elementos y busar uid
+
+  return jsonify(reference)
+
 #Crear Anuncio
 
 @app.route('/anuncio',methods=['POST'])
 def registroAnuncios():
-
-
   try:
 
     
@@ -263,6 +293,8 @@ def zona_anuncios():
   anuncios=db.reference("/anuncios").get()
   datos=anuncios.values()
   return jsonify(list(datos))
+
+  
   
   
 
@@ -270,7 +302,6 @@ def zona_anuncios():
 def registroEvento():
   reference=db.reference("/eventos")
   data=request.json
-
   request.headers["nombre de la cabecera "]
   evento={
   "tipoEvento":data["tipoEvento"],
