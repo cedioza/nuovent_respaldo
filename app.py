@@ -128,11 +128,13 @@ def registroUsuarios():
 #Buscar Anuncion
 @app.route('/obteneranuncio/<string:uid>')
 def obtenerAnuncio(uid):
-  reference=db.reference("/alojamiento").child(uid).get()
-  print(reference["anuncio"])
+  anuncio=db.reference('anuncio').child(uid).get()
+  
+  # reference=db.reference("/alojamiento").child(uid).get()
+  # print(reference["anuncio"])
 
 
-  return jsonify(reference)
+  return jsonify(anuncio)
 
 #Crear Anuncio
 
