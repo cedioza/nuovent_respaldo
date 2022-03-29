@@ -73,8 +73,8 @@ def sendEmail(email,name,case):
 @app.route('/home')
 def anuncios():
     anuncios=db.reference("/anuncios").order_by_key().limit_to_last(6).get()
-    # datos=anuncios.items()
-    datos=anuncios.values()
+    datos=anuncios.items()
+    # datos=anuncios.values()
     return jsonify(list(datos))
 
 #Login Usuario
