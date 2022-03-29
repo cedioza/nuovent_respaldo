@@ -128,30 +128,9 @@ def registroUsuarios():
 #Buscar Anuncion
 @app.route('/obtenerAnuncio/<string:uid>')
 def obtenerAnuncio(uid):
-  alojamiento=reference=db.reference("/alojamiento").child(uid).get()
-  print(alojamiento["anuncio"])
+  reference=db.reference("/alojamiento").child(uid).get()
+  print(reference["anuncio"])
 
-  # anuncios=alojamiento["anuncio"]
-  #para cuando sea un arreglo
-
-  database=reference=db.reference("/anuncios").child(alojamiento["anuncio"]).get()
-  if(database):
-    for key, value in database.items():
-        if(value["description"] == data["numDoc"]):
-          return True
-    
-
-
-  
-  # def validarExisteUsuario(reference,data):
-  #   database = reference.get()
-  #   if(database):
-  #     for key, value in database.items():
-  #       if(value["numDoc"] == data["numDoc"]):
-  #         return True
-
-
-  #recororr elementos y busar uid
 
   return jsonify(reference)
 
