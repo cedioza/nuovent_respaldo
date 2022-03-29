@@ -273,7 +273,7 @@ def zonaEvento():
 def zona_anuncios():
   anuncios=db.reference("/anuncios").get()
   datos=anuncios.items()
-  return jsonify((datos))
+  return jsonify(list(datos))
 
   
   
