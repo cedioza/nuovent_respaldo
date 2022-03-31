@@ -133,8 +133,10 @@ def obtenerAnuncio(uid):
 
   anuncio["telefono"]=alojamiento["telefono"]
   anuncio["email"]=alojamiento["email"]
+  anuncioP=[]
+  anuncioP.append(anuncio)
    
-  return jsonify({uid:anuncio})
+  return jsonify(anuncioP)
 
 #Crear Anuncio
 
@@ -281,7 +283,7 @@ def misAnuncios(uid):
     anuncioTotal.append(data)
 
 
-  return jsonify(anuncioTotal)
+  return jsonify(list(anuncioTotal))
   
 
 @app.route('/eliminarAlojamiento',methods=['POST'])      
