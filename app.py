@@ -165,6 +165,9 @@ def registroAnuncios():
     reference=db.reference("/error").push(e)
     return jsonify({"Mensaje":"Error creando anuncio"})
 
+#crear un alojamineto con uid enviado
+
+
 #Documentacion Relacionada Postman
 @app.route("/")
 
@@ -216,11 +219,12 @@ def eliminarUsuarios():
       else:
         return False     
 
-#Alojamiento datos
+#Alojamiento datos con uid dado
 
-@app.route('/registrarAlojamiento',  methods=['POST'])
-def registroAlojamientos():
-  reference=db.reference("/alojamientos")
+@app.route('/registrarAlojamiento/<string:uid>',  methods=['POST'])
+def registrarAlojamiento(uid):
+
+  reference=db.reference("/alojamientos").child(uid)
   data=request.json
   alojamiento={
   "nombrealojamiento":data["nombrealojamiento"],
@@ -234,11 +238,13 @@ def registroAlojamientos():
   "direccion":data["direccion"],
   "proveedor":data["proveedor"]
   }
-  if(validarExisteEvento(reference,alojamiento)):
+  if(validarExisteAlojamiento(reference,alojamiento)):
     return jsonify({"Mensaje":"Ya existe un vento creado con ese nit"})
   else:
-    create=reference.push(alojamiento)
-    return jsonify({"Mensaje":"Evento Creado satisfactoriamente","UID":create.key})
+    reference.set(alojamiento)
+    db.reference('/usuarios').child(uid).update({"state":"2"})
+    print("usuario cambio de estado ")
+    return jsonify({"Mensaje":"Alojamiento  Creado satisfactoriamente","UID":uid})
 
 #lista de productos
 
@@ -252,6 +258,12 @@ def actualizarAlojamiento():
       else:
         return False   
         
+# mis anuncios en base al uid del anuncio con el parametro del alojamiento
+
+
+@app.route('/mis anuncios/<string:uid>')
+
+
 @app.route('/eliminarAlojamiento',methods=['POST'])      
 def eliminarAlojamiento():
     database = db.reference("/usuarios")
@@ -359,16 +371,13 @@ def validarExisteUsuario(reference,data):
           return True
 
     return False
+
 def validarExisteAlojamiento(reference,data):
     database = reference.get()
     if(database):
       for key, value in database.items():
-        if(value["numDoc"] == data["numDoc"]):
+        if(value["nit"] == data["nit"]):
           return True
-        else:
-          return False
-    else:
-      return False
 
 def validarExisteEvento(reference,data):
     database = reference.get()
