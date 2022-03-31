@@ -261,8 +261,28 @@ def actualizarAlojamiento():
 # mis anuncios en base al uid del anuncio con el parametro del alojamiento
 
 
-@app.route('/mis anuncios/<string:uid>')
+@app.route('/misanuncios/<string:uid>')
+def misAnuncios(uid):
+  anuncios=db.reference('/anuncios').get()
+  misAnuncios=[]
+  anuncioTotal=[]
+  if(anuncios):
+     for key, value in anuncios.items():
+       print(value["uidAlojamiento"])
+       print(uid)
+       if(value["uidAlojamiento"] == uid):
+         misAnuncios.append(key)
 
+
+  for anuncio in misAnuncios:
+    data=db.reference('/anuncios').child(anuncio).get()
+    data["uid"]=anuncio
+    print(data)
+    anuncioTotal.append(data)
+
+
+  return jsonify(anuncioTotal)
+  
 
 @app.route('/eliminarAlojamiento',methods=['POST'])      
 def eliminarAlojamiento():
