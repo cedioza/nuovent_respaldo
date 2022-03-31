@@ -134,7 +134,7 @@ def obtenerAnuncio(uid):
   anuncio["telefono"]=alojamiento["telefono"]
   anuncio["email"]=alojamiento["email"]
    
-  return jsonify(list(anuncio))
+  return jsonify({uid:anuncio})
 
 #Crear Anuncio
 
