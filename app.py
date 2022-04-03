@@ -143,8 +143,6 @@ def obtenerAnuncio(uid):
 @app.route('/anuncio',methods=['POST'])
 def registroAnuncios():
   try:
-
-    
     reference=db.reference("/anuncios")
     data=request.form
     imagen=request.files 
@@ -153,7 +151,8 @@ def registroAnuncios():
     "description":data["description"],
     "numCapacity":data["numCapacity"],
     "location":data["location"],
-    "available":"available"
+    "available":"available",
+    "uidAlojamiento":"-MxXkbTPfIPWMERsvJzd"
     }
 
     for i in range(1,len(imagen)+1):
@@ -241,7 +240,7 @@ def registrarAlojamiento(uid):
   "proveedor":data["proveedor"]
   }
   if(validarExisteAlojamiento(reference,alojamiento)):
-    return jsonify({"Mensaje":"Ya existe un vento creado con ese nit"})
+    return jsonify({"Mensaje":"Ya existe un alojamiento  creado con ese nit"})
   else:
     reference.set(alojamiento)
     db.reference('/usuarios').child(uid).update({"state":"2"})
