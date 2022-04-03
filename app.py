@@ -154,7 +154,7 @@ def registroAnuncios():
     "numCapacity":data["numCapacity"],
     "location":data["location"],
     "available":"available",
-    "uidAlojamiento":"-MxXkbTPfIPWMERsvJzd"
+    "uidAlojamiento":data["uid"]
     }
 
     for i in range(1,len(imagen)+1):
