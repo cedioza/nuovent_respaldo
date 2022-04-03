@@ -80,24 +80,26 @@ def anuncios():
 #Login Usuario
 
 @app.route('/login',methods=['POST'])
-def login():   
-  data=request.json
-  email=data['email']
-  password=data['password']
-  user=auth.get_user_by_email(email)
-  #Validación sí existe usuario 
-  if(user):
-    usuario=db.reference("/usuarios").child(user.uid).get()
-    print(usuario)
-    if(usuario["password"]== password):
-      token=str(auth.create_custom_token(user.uid,usuario)).split("'")[1]
-      return jsonify({"token":token})
+def login(): 
+  try:  
+    data=request.json
+    email=data['email']
+    password=data['password']
+    user=auth.get_user_by_email(email)
+    #Validación sí existe usuario 
+    if(user):
+      usuario=db.reference("/usuarios").child(user.uid).get()
+      print(usuario)
+      if(usuario["password"]== password):
+        token=str(auth.create_custom_token(user.uid,usuario)).split("'")[1]
+        return jsonify({"token":token})
+      else:
+        return jsonify({"Message":"Contraseña Erronea intente nuevamente"})
     else:
-      return jsonify({"Message":"Contraseña Erronea intente nuevamente"})
-  else:
-    return jsonify({"Message":"Usuario No esta registrado"})
-
-# Registro Usuarios
+      return jsonify({"Message":"Usuario No esta registrado"})
+  except :
+    return jsonify({"Message":"Datos Incorrectos"})
+  # Registro Usuarios
 
 @app.route('/registro',methods=['POST'])
 def registroUsuarios():
