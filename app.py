@@ -270,24 +270,34 @@ def actualizarAlojamiento():
 @app.route('/misanuncios/<string:uid>')
 def misAnuncios(uid):
   anuncios=db.reference('/anuncios').get()
+
+
+
   misAnuncios=[]
   anuncioTotal=[]
   if(anuncios):
      for key, value in anuncios.items():
-       print(value["uidAlojamiento"])
-       print(uid)
+       
        if(value["uidAlojamiento"] == uid):
+         
          misAnuncios.append(key)
-
+         print(value)
+         
 
   for anuncio in misAnuncios:
     data=db.reference('/anuncios').child(anuncio).get()
-    data["uid"]=anuncio
-    print(data)
+    anuncioTotal.append(anuncio)
     anuncioTotal.append(data)
 
+    #  anuncios=db.reference("/anuncios").order_by_key().limit_to_last(6).get()
+    # datos=anuncios.items()
+    # # datos=anuncios.values()
+    # return jsonify(list(datos))
 
-  return jsonify(list(anuncioTotal))
+    
+
+
+  return jsonify(anuncioTotal)
   
 
 @app.route('/eliminarAlojamiento',methods=['POST'])      
