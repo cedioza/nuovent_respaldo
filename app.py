@@ -231,16 +231,15 @@ def registrarAlojamiento(uid):
   reference=db.reference("/alojamientos").child(uid)
   data=request.json
   alojamiento={
-  "nombrealojamiento":data["nombrealojamiento"],
+  "nombrealojamiento":data["business"],
   "nit":data["nit"],
   "email":data["email"],
-  "telefono":data["telefono"],
-  "responsable":data["responsable"],
-  "categoria":data["categoria"],
-  "descripcion":data["descripcion"],
-  "ciudad":data["ciudad"],
-  "direccion":data["direccion"],
-  "proveedor":data["proveedor"]
+  "telefono":data["phoneBusiness"],
+  "responsable":data["manager"],
+  "categoria":data["category"],
+  "descripcion":data["description"],
+  "ciudad":data["city"],
+  "direccion":data["address"]
   }
   if(validarExisteAlojamiento(reference,alojamiento)):
     return jsonify({"Mensaje":"Ya existe un alojamiento  creado con ese nit"})
