@@ -225,11 +225,10 @@ def eliminarUsuarios():
 
 #Alojamiento datos con uid dado
 
-@app.route('/registaralojamiento/<string:uid>',  methods=['POST'])
-def registrarAlojamiento(uid):
-
-  reference=db.reference("/alojamientos").child(uid)
+@app.route('/registaralojamiento/',  methods=['POST'])
+def registrarAlojamiento():
   data=request.json
+  reference=db.reference("/alojamientos").child(data["uidUser"])
   alojamiento={
   "nombrealojamiento":data["business"],
   "nit":data["nit"],
