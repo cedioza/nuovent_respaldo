@@ -297,7 +297,7 @@ def misAnuncios(uid):
     
 
 
-  return jsonify(anuncioTotal)
+  return jsonify(list(anuncioTotal))
   
 
 @app.route('/eliminarAlojamiento',methods=['POST'])      
