@@ -244,9 +244,9 @@ def registrarAlojamiento():
     return jsonify({"Mensaje":"Ya existe un alojamiento  creado con ese nit"})
   else:
     reference.set(alojamiento)
-    db.reference('/usuarios').child(uid).update({"state":"2"})
+    db.reference('/usuarios').child(data["userId"]).update({"state":"2"})
     print("usuario cambio de estado ")
-    return jsonify({"Mensaje":"Alojamiento  Creado satisfactoriamente","UID":uid})
+    return jsonify({"Mensaje":"Alojamiento  Creado satisfactoriamente","UID":data["userId"]})
 
 #lista de productos
 
