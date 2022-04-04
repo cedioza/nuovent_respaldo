@@ -131,7 +131,7 @@ def registroUsuarios():
 @app.route('/obteneranuncio/<string:uid>',methods=['GET'])
 def obtenerAnuncio(uid):
   anuncio=db.reference('/anuncios').child(uid).get()
-  alojamiento=db.reference('/alojamiento').child(anuncio["uidAlojamiento"]).get()
+  alojamiento=db.reference('/alojamientos').child(anuncio["uidAlojamiento"]).get()
 
   anuncio["telefono"]=alojamiento["telefono"]
   anuncio["email"]=alojamiento["email"]
@@ -225,7 +225,7 @@ def eliminarUsuarios():
 
 #Alojamiento datos con uid dado
 
-@app.route('/registrarAlojamiento/<string:uid>',  methods=['POST'])
+@app.route('/registaralojamiento/<string:uid>',  methods=['POST'])
 def registrarAlojamiento(uid):
 
   reference=db.reference("/alojamientos").child(uid)
