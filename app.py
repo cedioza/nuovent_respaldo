@@ -241,7 +241,7 @@ def registrarAlojamiento():
   "ciudad":data["city"],
   "direccion":data["address"]
   }
-  print(validarExisteAlojamiento())
+  print(validarExisteAlojamiento(reference,alojamiento))
   if(validarExisteAlojamiento(reference,alojamiento)):
     return jsonify({"Mensaje":"Ya existe un alojamiento  creado con ese nit"})
   else:
