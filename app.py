@@ -272,32 +272,23 @@ def misAnuncios(uid):
   anuncios=db.reference('/anuncios').get()
 
 
-
+  anuncioTotalTotal=[]
   misAnuncios=[]
   anuncioTotal=[]
   if(anuncios):
      for key, value in anuncios.items():
-       
        if(value["uidAlojamiento"] == uid):
-         
-         misAnuncios.append(key)
-         print(value)
-         
-  anuncioTotalTotal=[]
-  for anuncio in misAnuncios:
-    data=db.reference('/anuncios').child(anuncio).get()
-    
-    anuncioTotal.append(data)
-  
-  
+         misAnuncios.append(key) 
+         data=db.reference('/anuncios').child(key).get()
+         anuncioTotal.append(data)
 
-    #  anuncios=db.reference("/anuncios").order_by_key().limit_to_last(6).get()
-    # datos=anuncios.items()
-    # # datos=anuncios.values()
-    # return jsonify(list(datos))
-
-    
-
+  # for anuncio in misAnuncios:
+  #   data=db.reference('/anuncios').child(anuncio).get()
+  #   anuncioTotal.append(data)
+  #   #  anuncios=db.reference("/anuncios").order_by_key().limit_to_last(6).get()
+  #   # datos=anuncios.items()
+  #   # # datos=anuncios.values()
+  #   # return jsonify(list(datos))
 
   return jsonify(list(zip(misAnuncios,anuncioTotal)))
   
