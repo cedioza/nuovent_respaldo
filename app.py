@@ -225,10 +225,11 @@ def eliminarUsuarios():
 
 #Alojamiento datos con uid dado
 
-@app.route('/registaralojamiento/',  methods=['POST'])
+@app.route('/registraralojamiento',  methods=['POST'])
 def registrarAlojamiento():
   data=request.json
   reference=db.reference("/alojamientos").child(data["userId"])
+
   alojamiento={
   "nombrealojamiento":data["business"],
   "nit":data["nit"],
@@ -240,9 +241,12 @@ def registrarAlojamiento():
   "ciudad":data["city"],
   "direccion":data["address"]
   }
+  print(validarExisteAlojamiento())
   if(validarExisteAlojamiento(reference,alojamiento)):
     return jsonify({"Mensaje":"Ya existe un alojamiento  creado con ese nit"})
   else:
+    print("ingreso un nuevo alojamiento")
+    print(data["userId"])
     reference.set(alojamiento)
     db.reference('/usuarios').child(data["userId"]).update({"state":"2"})
     print("usuario cambio de estado ")
