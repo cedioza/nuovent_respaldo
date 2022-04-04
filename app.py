@@ -250,7 +250,7 @@ def registrarAlojamiento():
     reference.set(alojamiento)
     db.reference('/usuarios').child(data["userId"]).update({"state":"2"})
     print("usuario cambio de estado ")
-    return jsonify({"Mensaje":"Alojamiento  Creado satisfactoriamente","UID":data["userId"]})
+    return jsonify({"state":2})
 
 #lista de productos
 
