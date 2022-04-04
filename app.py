@@ -148,6 +148,7 @@ def registroAnuncios():
     reference=db.reference("/anuncios")
     data=request.form
     imagen=request.files 
+    print(data)
     anuncios={
     "nomAnounce":data["nomAnounce"],
     "description":data["description"],
