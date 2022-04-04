@@ -286,9 +286,10 @@ def misAnuncios(uid):
   anuncioTotalTotal=[]
   for anuncio in misAnuncios:
     data=db.reference('/anuncios').child(anuncio).get()
-    anuncioTotal.append(anuncio)
+    
     anuncioTotal.append(data)
-    anuncioTotalTotal.append(anuncioTotal)
+  
+  
 
     #  anuncios=db.reference("/anuncios").order_by_key().limit_to_last(6).get()
     # datos=anuncios.items()
@@ -298,7 +299,7 @@ def misAnuncios(uid):
     
 
 
-  return jsonify((anuncioTotalTotal))
+  return jsonify(list(zip(misAnuncios,anuncioTotal)))
   
 
 @app.route('/eliminarAlojamiento',methods=['POST'])      
