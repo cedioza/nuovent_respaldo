@@ -68,6 +68,16 @@ def sendEmail(email,name,case):
       print(e)
 
 
+# error 404
+@app.errorhandler(404) 
+def invalid_route(e): 
+    return jsonify({'Message' : 'Error 404 Ruta no encontrada intenta nuevamente'})
+
+# error 405
+@app.errorhandler(405) 
+def invalid_route(e): 
+    return jsonify({'Message' : f'Error 405 Metodo {request.method} no esta permitido '})
+
 
 # Home
 @app.route('/home')
@@ -270,28 +280,26 @@ def actualizarAlojamiento():
 @app.route('/misanuncios/<string:uid>')
 def misAnuncios(uid):
   anuncios=db.reference('/anuncios').get()
-
-
   anuncioTotalTotal=[]
-  misAnuncios=[]
-  anuncioTotal=[]
-  if(anuncios):
-     for key, value in anuncios.items():
-       if(value["uidAlojamiento"] == uid):
-         misAnuncios.append(key) 
-         data=db.reference('/anuncios').child(key).get()
-         anuncioTotal.append(data)
-
-  # for anuncio in misAnuncios:
-  #   data=db.reference('/anuncios').child(anuncio).get()
-  #   anuncioTotal.append(data)
-  #   #  anuncios=db.reference("/anuncios").order_by_key().limit_to_last(6).get()
-  #   # datos=anuncios.items()
-  #   # # datos=anuncios.values()
-  #   # return jsonify(list(datos))
-
-  return jsonify(list(zip(misAnuncios,anuncioTotal)))
-  
+  try:
+    misAnuncios=[]
+    anuncioTotal=[]
+    if(anuncios):
+       for key, value in anuncios.items():
+         if(value["uidAlojamiento"] == uid):
+           misAnuncios.append(key) 
+           data=db.reference('/anuncios').child(key).get()
+           anuncioTotal.append(data)
+    # for anuncio in misAnuncios:
+    #   data=db.reference('/anuncios').child(anuncio).get()
+    #   anuncioTotal.append(data)
+    #   #  anuncios=db.reference("/anuncios").order_by_key().limit_to_last(6).get()
+    #   # datos=anuncios.items()
+    #   # # datos=anuncios.values()
+    #   # return jsonify(list(datos))
+    return jsonify(list(zip(misAnuncios,anuncioTotal)))
+  except :
+    return jsonify({"Message":"uid incorrecto intente nuevamente" })
 
 @app.route('/eliminarAlojamiento',methods=['POST'])      
 def eliminarAlojamiento():
@@ -316,9 +324,6 @@ def zona_anuncios():
   datos=anuncios.items()
   return jsonify(list(datos))
 
-  
-  
-  
 
 @app.route('/evento',methods=['POST'])
 def registroEvento():
@@ -435,6 +440,9 @@ def validarExisteEvento(reference,data):
 #     print(response.headers)
 #   except Exception as e:
 #     print(e.body)
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
