@@ -116,6 +116,7 @@ def registroUsuarios():
   reference=db.reference("/usuarios")
   data=request.json
   usuarios={
+
   "nombre":data["nombre"],
   "typeDoc":data["typeDoc"],
   "numDoc":data["numDoc"],
@@ -398,16 +399,19 @@ def validar():
   #jsonify(db.reference("/users").child(create.uid).get()) buscamos por el create uid
 
 def validarExisteUsuario(reference,data):
-    database = reference.get()
-    if(database):
-      for key, value in database.items():
-        if(value["numDoc"] == data["numDoc"]):
-          return True
-
-    return False
-
+    try:
+      database = reference.get()
+      if(database):
+        for key, value in database.items():
+          print(value)
+          if(value["numDoc"] == data["numDoc"]):
+            return True
+      return False
+    except :
+      return False
 def validarExisteAlojamiento(reference,data):
     database = reference.get()
+   
     if(database):
       for key, value in database.items():
         if(value["nit"] == data["nit"]):
