@@ -48,7 +48,108 @@ def sendEmail(email,name,case):
   
   if case==1:
     subject=f'Bienvenido a Nuovent {name} '
-    content='<strong>Bienvenido  ahora podras crear nuevos anuncios o alojamientos </strong>'
+    content='''<td>
+                            <!--[if mso]>
+    <center>
+    <table><tr><td width="600">
+  <![endif]-->
+                                    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:600px;" align="center">
+                                      <tbody><tr>
+                                        <td role="modules-container" style="padding:0px 0px 0px 0px; color:#516775; text-align:left;" bgcolor="#F9F5F2" width="100%" align="left"><table class="module preheader preheader-hide" role="module" data-type="preheader" border="0" cellpadding="0" cellspacing="0" width="100%" style="display: none !important; mso-hide: all; visibility: hidden; opacity: 0; color: transparent; height: 0; width: 0;">
+    <tbody><tr>
+      <td role="module-content">
+        <p>Ingrid &amp; Anders knows your style!</p>
+      </td>
+    </tr>
+  </tbody></table><table class="module" role="module" data-type="spacer" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;" data-muid="bdzDb4B4pnnez4W7L1KpxJ">
+      <tbody><tr>
+        <td style="padding:0px 0px 30px 0px;" role="module-content" bgcolor="">
+        </td>
+      </tr>
+    </tbody></table><table class="wrapper" role="module" data-type="image" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;" data-muid="572c1c6a-0a31-4dec-aefd-075ab9e5cda4">
+    <tbody>
+      <tr>
+        <td style="font-size:6px; line-height:10px; padding:0px 0px 0px 0px;" valign="top" align="center">
+          <img class="max-width" border="0" style="display:block; color:#000000; text-decoration:none; font-family:Helvetica, arial, sans-serif; font-size:16px; max-width:100% !important; width:100%; height:auto !important;" width="600" alt="" data-proportionally-constrained="true" data-responsive="true" src="http://cdn.mcauto-images-production.sendgrid.net/6c29d3a10ca3a34b/b1de1558-0d65-4e0c-b291-75121c6138bf/1004x590.png">
+        </td>
+      </tr>
+    </tbody>
+  </table><table class="module" role="module" data-type="text" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;" data-muid="gNWHzBzkFeWH4JDKd2Aikk" data-mc-module-version="2019-10-22">
+      <tbody><tr>
+        <td style="background-color:#F9F5F2; padding:50px 0px 10px 0px; line-height:30px; text-align:inherit;" height="100%" valign="top" bgcolor="#F9F5F2"><div><div style="font-family: inherit; text-align: center"><span style="color: #516775; font-size: 28px; font-family: georgia, serif"><strong>Bienvenido a Nuovent!</strong></span></div><div></div></div></td>
+      </tr>
+    </tbody></table><table class="module" role="module" data-type="text" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;" data-muid="bA2FfEE6abadx6yKoMr3F9" data-mc-module-version="2019-10-22">
+      <tbody><tr>
+        <td style="padding:10px 40px 50px 40px; line-height:22px; text-align:inherit; background-color:#F9F5F2;" height="100%" valign="top" bgcolor="#F9F5F2"><div><h1 style="text-align: center">Encuentra tu espacio ideal</h1>
+<div style="font-family: inherit; text-align: center"><span style="box-sizing: border-box; margin-top: 0px; margin-bottom: 1rem; font-size: 1.25rem; font-weight: 300; font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Fira Sans&quot;, &quot;Droid Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(248, 249, 250); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; color: #101010">Mira espacios para realizar tu evento ideal en el lugar perfecto para ti y tu invitados; haz que los momentos más importantes en la vida, tengan una celebración especial, Nuovent.com te ayuda a encontrar y contactar directamente con los prestadores de los servicios y espacios para la realización de eventos.</span><span style="color: #101010">&nbsp;</span></div><div></div></div></td>
+      </tr>
+    </tbody></table><table border="0" cellpadding="0" cellspacing="0" class="module" data-role="module-button" data-type="button" role="module" style="table-layout:fixed;" width="100%" data-muid="39993cb2-a42d-4dff-9244-d7e64c4cf5e2">
+      <tbody>
+        <tr>
+          <td align="center" bgcolor="" class="outer-td" style="padding:0px 0px 0px 0px;">
+            <table border="0" cellpadding="0" cellspacing="0" class="wrapper-mobile" style="text-align:center;">
+              <tbody>
+                <tr>
+                <td align="center" bgcolor="#20A2E8" class="inner-td" style="border-radius:6px; font-size:16px; text-align:center; background-color:inherit;">
+                  <a href="" style="background-color:#20A2E8; border:1px solid #333333; border-color:#333333; border-radius:6px; border-width:1px; color:#ffffff; display:inline-block; font-size:14px; font-weight:normal; letter-spacing:0px; line-height:normal; padding:12px 18px 12px 18px; text-align:center; text-decoration:none; border-style:solid;" target="_blank">Ver Anuncios</a>
+                </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table><table class="module" role="module" data-type="divider" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;" data-muid="qkG1GEG4EZSwoAzbwgoD8v">
+      <tbody><tr>
+        <td style="padding:0px 0px 0px 0px;" role="module-content" height="100%" valign="top" bgcolor="">
+          <table border="0" cellpadding="0" cellspacing="0" align="center" width="100%" height="10px" style="line-height:10px; font-size:10px;">
+            <tbody><tr>
+              <td style="padding:0px 0px 10px 0px;" bgcolor=""></td>
+            </tr>
+          </tbody></table>
+        </td>
+      </tr>
+    </tbody></table><table class="module" role="module" data-type="social" align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;" data-muid="811a4d90-5cf8-4edd-afaf-8d7ae129dd7e">
+    <tbody>
+      <tr>
+        <td valign="top" style="padding:0px 0px 0px 0px; font-size:6px; line-height:10px;" align="center">
+          <table align="center" style="-webkit-margin-start:auto;-webkit-margin-end:auto;">
+            <tbody><tr align="center"><td style="padding: 0px 5px;" class="social-icon-column">
+      <a role="social-icon-link" href="https://facebook.com" target="_blank" alt="Facebook" title="Facebook" style="display:inline-block; background-color:#516775; height:30px; width:30px; border-radius:30px; -webkit-border-radius:30px; -moz-border-radius:30px;">
+        <img role="social-icon" alt="Facebook" title="Facebook" src="https://mc.sendgrid.com/assets/social/white/facebook.png" style="height:30px; width:30px;" height="30" width="30">
+      </a>
+    </td><td style="padding: 0px 5px;" class="social-icon-column">
+      <a role="social-icon-link" href="https://twitter.com" target="_blank" alt="Twitter" title="Twitter" style="display:inline-block; background-color:#516775; height:30px; width:30px; border-radius:30px; -webkit-border-radius:30px; -moz-border-radius:30px;">
+        <img role="social-icon" alt="Twitter" title="Twitter" src="https://mc.sendgrid.com/assets/social/white/twitter.png" style="height:30px; width:30px;" height="30" width="30">
+      </a>
+    </td><td style="padding: 0px 5px;" class="social-icon-column">
+      <a role="social-icon-link" href="https://instagram.com" target="_blank" alt="Instagram" title="Instagram" style="display:inline-block; background-color:#516775; height:30px; width:30px; border-radius:30px; -webkit-border-radius:30px; -moz-border-radius:30px;">
+        <img role="social-icon" alt="Instagram" title="Instagram" src="https://mc.sendgrid.com/assets/social/white/instagram.png" style="height:30px; width:30px;" height="30" width="30">
+      </a>
+    </td><td style="padding: 0px 5px;" class="social-icon-column">
+      <a role="social-icon-link" href="https://www.pinterest.com/sendgrid/" target="_blank" alt="Pinterest" title="Pinterest" style="display:inline-block; background-color:#516775; height:30px; width:30px; border-radius:30px; -webkit-border-radius:30px; -moz-border-radius:30px;">
+        <img role="social-icon" alt="Pinterest" title="Pinterest" src="https://mc.sendgrid.com/assets/social/white/pinterest.png" style="height:30px; width:30px;" height="30" width="30">
+      </a>
+    </td></tr></tbody>
+          </table>
+        </td>
+      </tr>
+    </tbody>
+  </table><table class="module" role="module" data-type="spacer" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;" data-muid="f5F8P1n4pQyU8o7DNMMEyW">
+      <tbody><tr>
+        <td style="padding:0px 0px 30px 0px;" role="module-content" bgcolor="">
+        </td>
+      </tr>
+    </tbody></table></td>
+                                      </tr>
+                                    </tbody></table>
+                                    <!--[if mso]>
+                                  </td>
+                                </tr>
+                              </table>
+                            </center>
+                            <![endif]-->
+                          </td>'''
   else:
    subject=f'Nuevo anuncio creado'
    content=f'<strong> Se creo un nuevo anuncio {name} </strong>'
